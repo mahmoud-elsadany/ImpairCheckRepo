@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ~ Copyright 2023 The TensorFlow Authors. All Rights Reserved.
+    ~
+    ~ Licensed under the Apache License, Version 2.0 (the "License");
+    ~ you may not use this file except in compliance with the License.
+    ~ You may obtain a copy of the License at
+    ~
+    ~       http://www.apache.org/licenses/LICENSE-2.0
+    ~
+    ~ Unless required by applicable law or agreed to in writing, software
+    ~ distributed under the License is distributed on an "AS IS" BASIS,
+    ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    ~ See the License for the specific language governing permissions and
+    ~ limitations under the License.
+-->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/permissions_fragment">
+
+    <fragment
+        android:id="@+id/permissions_fragment"
+        android:name="com.impaircheck.fragment.PermissionsFragment"
+        android:label="PermissionsFragment">
+
+        <action
+            android:id="@+id/action_permissions_to_camera"
+            app:destination="@id/gallery_fragment"
+            app:popUpTo="@id/permissions_fragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/camera_fragment"
+        android:name="com.impaircheck.fragment.CameraFragment"
+        android:label="CameraFragment"/>
+
+
+    <fragment
+        android:id="@+id/questionnaire_fragment"
+        android:name="com.impaircheck.fragment.QuestionnaireFragment"
+        android:label="QuestionnaireFragment"/>
+
+
+    <fragment
+        android:id="@+id/gallery_fragment"
+        android:name="com.impaircheck.fragment.GalleryFragment"
+        android:label="GalleryFragment">
+        <action
+            android:id="@+id/action_gallery_to_permissions"
+            app:destination="@id/permissions_fragment"
+            app:popUpTo="@id/gallery_fragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/registrationFragment"
+        android:name="com.impaircheck.fragment.RegistrationFragment"
+        android:label="Registration">
+        <action
+            android:id="@+id/action_registration_to_camera"
+            app:destination="@id/faceCameraFragment" />
+        <action android:id="@+id/action_registration_to_enrollment"
+            app:destination="@id/enrollmentFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/faceCameraFragment"
+        android:name="com.impaircheck.fragment.FaceCameraFragment"
+        android:label="Camera">
+        <action
+            android:id="@+id/action_face_camera_to_preview"
+            app:destination="@id/registrationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/enrollmentFragment"
+        android:name="com.impaircheck.fragment.EnrollmentFragment"
+        android:label="Camera">
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/moveAnalysisFragment"
+        android:name="com.impaircheck.fragment.MoveAnalysisFragment"
+        android:label="Camera">
+
+    </fragment>
+
+</navigation>
