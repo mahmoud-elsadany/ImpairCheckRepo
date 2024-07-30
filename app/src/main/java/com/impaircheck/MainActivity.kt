@@ -24,7 +24,6 @@ import com.impaircheck.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var activityMainBinding: ActivityMainBinding
-    private val viewModel : MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,8 +32,8 @@ class MainActivity : AppCompatActivity() {
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
-        val navController = navHostFragment.navController
-        activityMainBinding.navigation.setupWithNavController(navController)
+//        val navController = navHostFragment.navController
+//        activityMainBinding.navigation.setupWithNavController(navController)
 
     }
 

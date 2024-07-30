@@ -31,7 +31,6 @@
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?android:attr/actionBarSize"
             android:background="@android:color/transparent"
             android:keepScreenOn="true"
             app:defaultNavHost="true"
@@ -39,21 +38,21 @@
             tools:context=".MainActivity" />
 
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/navigation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            app:itemIconTint="@color/bg_nav_item"
-            app:itemTextColor="@color/bg_nav_item"
-            app:menu="@menu/menu_bottom_nav" />
+<!--        <com.google.android.material.bottomnavigation.BottomNavigationView-->
+<!--            android:id="@+id/navigation"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_alignParentTop="true"-->
+<!--            app:itemIconTint="@color/bg_nav_item"-->
+<!--            app:itemTextColor="@color/bg_nav_item"-->
+<!--            app:menu="@menu/menu_bottom_nav" />-->
 
-        <View
-            android:id="@+id/view"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@id/navigation"
-            android:background="@android:color/darker_gray" />
+<!--        <View-->
+<!--            android:id="@+id/view"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="1dp"-->
+<!--            android:layout_below="@id/navigation"-->
+<!--            android:background="@android:color/darker_gray" />-->
 
     </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
