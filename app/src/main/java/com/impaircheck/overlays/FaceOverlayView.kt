@@ -1,4 +1,4 @@
-package com.impaircheck
+package com.impaircheck.overlays
 
 /*
  * Copyright 2023 The TensorFlow Authors. All Rights Reserved.

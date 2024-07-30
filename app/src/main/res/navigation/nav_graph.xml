@@ -26,7 +26,7 @@
 
         <action
             android:id="@+id/action_permissions_to_camera"
-            app:destination="@id/gallery_fragment"
+            app:destination="@id/startScreenFragment"
             app:popUpTo="@id/permissions_fragment"
             app:popUpToInclusive="true" />
 
@@ -88,5 +88,9 @@
         android:label="Camera">
 
     </fragment>
+    <fragment
+        android:id="@+id/startScreenFragment"
+        android:name="com.impaircheck.fragment.StartScreenFragment"
+        android:label="StartScreenFragment" />
 
 </navigation>

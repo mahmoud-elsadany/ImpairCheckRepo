@@ -48,6 +48,7 @@
     <string name="label_delegate">Delegate</string>
     <string name="questionnaire_title">Drug Test</string>
     <string name="move_analysis">Move Analysis</string>
+    <string name="start_screen_title">Fill the required data</string>
 
     <string-array name="delegate_spinner_titles">
         <item>CPU</item>

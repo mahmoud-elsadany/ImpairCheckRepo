@@ -1,11 +1,13 @@
 package com.impaircheck.fragment
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import com.impaircheck.R
 import android.util.Size
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
@@ -56,9 +58,11 @@ class EnrollmentFragment : Fragment() {
         binding.root.isFocusableInTouchMode = true
         binding.root.requestFocus()
 
+
         return binding.root
 
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

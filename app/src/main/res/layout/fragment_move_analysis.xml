@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
     ~ Copyright 2023 The TensorFlow Authors. All Rights Reserved.
     ~
     ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,8 @@
     ~ limitations under the License.
 -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:Tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/camera_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -27,7 +26,7 @@
         android:layout_height="match_parent"
         app:scaleType="fillStart" />
 
-    <com.impaircheck.PoseOverlayView
+    <com.impaircheck.overlays.PoseOverlayView
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -39,27 +38,24 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/leftLeg_pose_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/leftLeg_pose_text"
-            Tools:text="Pose Detection"
-            android:textSize="20sp"
-
+            android:gravity="center"
             android:textColor="@color/white"
-            android:gravity="center"/>
+
+            android:textSize="20sp"
+            Tools:text="Pose Detection" />
 
         <TextView
+            android:id="@+id/rightLeg_pose_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/rightLeg_pose_text"
-            Tools:text="Pose Detection"
-            android:textSize="20sp"
+            android:gravity="center"
             android:textColor="@color/white"
-            android:gravity="center"/>
+            android:textSize="20sp"
+            Tools:text="Pose Detection" />
     </LinearLayout>
-
-
-
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
