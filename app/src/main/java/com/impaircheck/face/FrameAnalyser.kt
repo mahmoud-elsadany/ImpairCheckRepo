@@ -119,6 +119,9 @@ class FrameAnalyser( context: Context ,
         withContext( Dispatchers.Main ) {
             t1 = System.currentTimeMillis()
             val predictions = ArrayList<Prediction>()
+
+
+            faceAnalyserRepo.numberOfFacesDetected(faces.size)
             for (face in faces) {
 
                 try {
@@ -265,4 +268,6 @@ class FrameAnalyser( context: Context ,
 interface FaceAnalyserRepo {
 
     fun theDetectedUser(name: String)
+
+    fun numberOfFacesDetected(number: Int)
 }

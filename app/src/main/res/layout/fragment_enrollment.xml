@@ -1,26 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/touchable_zoom_fragment"
-    android:layout_height="match_parent"
->
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="match_parent"
-        android:layout_centerInParent="true"
         android:layout_height="match_parent"
+        android:layout_centerInParent="true"
 
         />
+
+    <com.ml.quaterion.facenetdetection.BoundingBoxOverlay
+        android:id="@+id/bbox_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <!-- Overlay view to draw the frame -->
     <com.impaircheck.overlays.FaceFrameOverlayView
         android:id="@+id/overlayView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -29,85 +32,77 @@
         android:layout_marginTop="50dp"
 
 
-
         >
+
         <TextView
             android:id="@+id/tv_zoom_factor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1.0x"
-            android:paddingHorizontal="10dp"
-            android:textStyle="bold"
             android:layout_gravity="center_vertical"
+            android:paddingHorizontal="10dp"
+            android:text="1.0x"
             android:textSize="12dp"
+            android:textStyle="bold"
 
             />
 
 
     </LinearLayout>
 
+
+    <TextView
+        android:id="@+id/waringtvName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn_layout"
+        android:gravity="center"
+        android:textColor="@color/red"
+        android:textSize="20sp"
+        android:visibility="gone" />
+
     <LinearLayout
+        android:id="@+id/btn_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_marginHorizontal="10dp"
-            android:layout_marginBottom="3dp">
+            android:layout_marginBottom="3dp"
+            android:orientation="vertical">
+
+
+            <ImageView
+                android:id="@+id/btn_take_photo"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:src="@drawable/capture_icon"
+                app:tint="#ffffff" />
 
             <Button
                 android:id="@+id/btn_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginEnd="5dp"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:padding="10dp"
+                android:padding="5dp"
                 android:text="Cancel"
                 android:textStyle="bold"
 
-
                 />
 
-
-
-            <ImageView
-                android:id="@+id/btn_take_photo"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:gravity="center"
-                android:src="@drawable/capture_icon"
-
-
-                app:tint="#ffffff" />
-
-
-
-
-            <Button
-                android:id="@+id/btn_done"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="5dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:padding="10dp"
-                android:text="Done"
-                android:textStyle="bold"
-
-
-                />
 
         </LinearLayout>
 
     </LinearLayout>
-
 
 
 </RelativeLayout>

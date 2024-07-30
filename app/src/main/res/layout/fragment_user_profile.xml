@@ -1,0 +1,51 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/title_start_screen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:text="@string/user_profile_screen_title" />
+
+
+    <TextView
+        android:id="@+id/lastTestDate"
+        android:layout_below="@+id/title_start_screen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:text="@string/last_test_date" />
+
+
+
+    <TextView
+        android:id="@+id/lastTestScore"
+        android:layout_below="@+id/lastTestDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:textSize="18sp"
+        android:text="@string/last_test_score" />
+
+
+    <Button
+        android:id="@+id/buttonReTest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lastTestScore"
+        android:layout_marginTop="16dp"
+        android:text="@string/retest" />
+
+
+
+</RelativeLayout>

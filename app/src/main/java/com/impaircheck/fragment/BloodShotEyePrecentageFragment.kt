@@ -15,6 +15,8 @@
  */
 package com.impaircheck.fragment
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -34,6 +36,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarker
 import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarkerResult
@@ -41,13 +44,14 @@ import com.impaircheck.FaceLandmarkerHelper
 import com.impaircheck.MainViewModel
 import com.impaircheck.R
 import com.impaircheck.databinding.FragmentGalleryBinding
+import com.ml.quaterion.facenetdetection.Constants
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
-class GalleryFragment : Fragment(), FaceLandmarkerHelper.LandmarkerListener {
+class BloodShotEyePrecentageFragment : Fragment(), FaceLandmarkerHelper.LandmarkerListener {
 
     enum class MediaType {
         IMAGE,
@@ -107,9 +111,13 @@ class GalleryFragment : Fragment(), FaceLandmarkerHelper.LandmarkerListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fragmentGalleryBinding.fabGetContent.setOnClickListener {
-            getContent.launch(arrayOf("image/*", "video/*"))
-        }
+
+        runDetectionOnImage(Constants.imageUri!!)
+
+
+//        fragmentGalleryBinding.fabGetContent.setOnClickListener {
+//            getContent.launch(arrayOf("image/*", "video/*"))
+//        }
 //        with(fragmentGalleryBinding.recyclerviewResults) {
 //            layoutManager = LinearLayoutManager(requireContext())
 //            adapter = faceBlendshapesResultAdapter
@@ -137,8 +145,9 @@ class GalleryFragment : Fragment(), FaceLandmarkerHelper.LandmarkerListener {
     private fun initBottomSheetControls() {
         // init bottom sheet settings
 
-
         handleCaptureEyeButton()
+
+        handleNextButton()
 
 //        fragmentGalleryBinding.bottomSheetLayout.maxFacesValue.text =
 //            viewModel.currentMaxFaces.toString()
@@ -252,32 +261,23 @@ class GalleryFragment : Fragment(), FaceLandmarkerHelper.LandmarkerListener {
 //            }
     }
 
-    // Update the values displayed in the bottom sheet. Reset detector.
-    private fun updateControlsUi() {
-        if (fragmentGalleryBinding.videoView.isPlaying) {
-            fragmentGalleryBinding.videoView.stopPlayback()
+    private fun handleNextButton() {
+        fragmentGalleryBinding.nextButton.setOnClickListener {
+            showDialog()
         }
-        fragmentGalleryBinding.videoView.visibility = View.GONE
-        fragmentGalleryBinding.imageResult.visibility = View.GONE
-        fragmentGalleryBinding.overlay.clear()
-//        fragmentGalleryBinding.bottomSheetLayout.maxFacesValue.text =
-//            viewModel.currentMaxFaces.toString()
-//        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdValue.text =
-//            String.format(
-//                Locale.US, "%.2f", viewModel.currentMinFaceDetectionConfidence
-//            )
-//        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdValue.text =
-//            String.format(
-//                Locale.US, "%.2f", viewModel.currentMinFaceTrackingConfidence
-//            )
-//        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdValue.text =
-//            String.format(
-//                Locale.US, "%.2f", viewModel.currentMinFacePresenceConfidence
-//            )
-
-        fragmentGalleryBinding.overlay.clear()
-        fragmentGalleryBinding.tvPlaceholder.visibility = View.VISIBLE
     }
+
+    private fun showDialog() {
+        val dialog = AlertDialog.Builder(requireContext())
+        dialog.setTitle(getString(R.string.dialog_title))
+        dialog.setMessage(getString(R.string.dialog_go_to_move_analysis_message))
+        dialog.setPositiveButton("OK") { dialogInterface: DialogInterface, i: Int ->
+            dialogInterface.dismiss()
+            findNavController().navigate(R.id.moveAnalysisFragment)
+        }
+        dialog.show()
+    }
+
 
     // Load and display the image.
     private fun runDetectionOnImage(uri: Uri) {
@@ -390,6 +390,9 @@ class GalleryFragment : Fragment(), FaceLandmarkerHelper.LandmarkerListener {
                     imageHeight,
                     scaleFactor
                 )
+
+                fragmentGalleryBinding.nextButton.isEnabled = true
+
             } else
                 Toast.makeText(requireContext(), "Face not detected", Toast.LENGTH_SHORT).show()
 
@@ -866,7 +869,7 @@ class GalleryFragment : Fragment(), FaceLandmarkerHelper.LandmarkerListener {
     }
 
     private fun setUiEnabled(enabled: Boolean) {
-        fragmentGalleryBinding.fabGetContent.isEnabled = enabled
+//        fragmentGalleryBinding.fabGetContent.isEnabled = enabled
 //        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdMinus.isEnabled =
 //            enabled
 //        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdPlus.isEnabled =

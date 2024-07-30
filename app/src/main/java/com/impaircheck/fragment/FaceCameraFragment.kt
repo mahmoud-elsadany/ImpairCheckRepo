@@ -32,6 +32,7 @@ import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.fragment.findNavController
 import com.google.common.util.concurrent.ListenableFuture
 import com.impaircheck.R
 import com.impaircheck.databinding.FragmentFaceCameraBinding
@@ -89,15 +90,15 @@ class FaceCameraFragment: Fragment(), FaceAnalyserRepo {
     // <---------------------------------------------------------------->
 
 
-    companion object {
-
-        lateinit var logTextView: TextView
-
-        fun setMessage(message: String) {
-            logTextView.text = message
-        }
-
-    }
+//    companion object {
+//
+//        lateinit var logTextView: TextView
+//
+//        fun setMessage(message: String) {
+//            logTextView.text = message
+//        }
+//
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -105,8 +106,6 @@ class FaceCameraFragment: Fragment(), FaceAnalyserRepo {
     ): View? {
         cameraBinding = FragmentFaceCameraBinding.inflate(inflater, container, false)
         previewView = cameraBinding.previewView
-        logTextView = cameraBinding.logTextview
-        logTextView.movementMethod = ScrollingMovementMethod()
         return cameraBinding.root
     }
 
@@ -254,14 +253,22 @@ class FaceCameraFragment: Fragment(), FaceAnalyserRepo {
 
 
                             //exif issue workaround
-                            val imgURI: Uri = Uri.fromFile(photoFile)
+                            Constants.imageUri = Uri.fromFile(photoFile)
 
                             isTakingPhoto = false
-                            imageUri = imgURI
                             Log.d(
                                 "CameraFragment",
-                                "Image saved successfully, Image Uri: $imageUri"
+                                "Image saved successfully, Image Uri: ${Constants.imageUri}"
                             )
+
+                            if (unknownTrials == 0) {
+                                findNavController().navigate(R.id.gallery_fragment)
+                            }
+
+
+
+
+
 
 
                         }
@@ -378,6 +385,10 @@ class FaceCameraFragment: Fragment(), FaceAnalyserRepo {
             unknownTrials = 0
         }
 
+
+    }
+
+    override fun numberOfFacesDetected(number: Int) {
 
     }
 

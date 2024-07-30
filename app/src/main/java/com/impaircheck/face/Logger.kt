@@ -22,12 +22,12 @@ class Logger {
     companion object {
 
         fun log( message : String ) {
-            FaceCameraFragment.setMessage(  FaceCameraFragment.logTextView.text.toString() + "\n" + ">> $message" )
-            // To scroll to the last message
-            // See this SO answer -> https://stackoverflow.com/a/37806544/10878733
-            while ( FaceCameraFragment.logTextView.canScrollVertically(1) ) {
-                FaceCameraFragment.logTextView.scrollBy(0, 10)
-            }
+//            FaceCameraFragment.setMessage(  FaceCameraFragment.logTextView.text.toString() + "\n" + ">> $message" )
+//            // To scroll to the last message
+//            // See this SO answer -> https://stackoverflow.com/a/37806544/10878733
+//            while ( FaceCameraFragment.logTextView.canScrollVertically(1) ) {
+//                FaceCameraFragment.logTextView.scrollBy(0, 10)
+//            }
         }
 
     }

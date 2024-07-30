@@ -46,7 +46,7 @@
 
     <fragment
         android:id="@+id/gallery_fragment"
-        android:name="com.impaircheck.fragment.GalleryFragment"
+        android:name="com.impaircheck.fragment.BloodShotEyePrecentageFragment"
         android:label="GalleryFragment">
         <action
             android:id="@+id/action_gallery_to_permissions"
@@ -92,5 +92,9 @@
         android:id="@+id/startScreenFragment"
         android:name="com.impaircheck.fragment.StartScreenFragment"
         android:label="StartScreenFragment" />
+    <fragment
+        android:id="@+id/userProfileScreenFragment"
+        android:name="com.impaircheck.fragment.UserProfileScreenFragment"
+        android:label="UserProfileScreenFragment" />
 
 </navigation>

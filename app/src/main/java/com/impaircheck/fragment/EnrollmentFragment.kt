@@ -15,6 +15,9 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.impaircheck.databinding.FragmentEnrollmentBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -105,7 +108,6 @@ class EnrollmentFragment : Fragment() {
 
             takePhoto()
         }
-        handleBtnDone()
         handleBtnCancel()
 
 
@@ -120,11 +122,6 @@ class EnrollmentFragment : Fragment() {
 
 
 
-    private fun handleBtnDone() {
-        binding.btnDone.setOnClickListener {
-            sendImagesUrisToCallingFragment()
-        }
-    }
 
 
     private fun hideAndShowViews() {
@@ -133,7 +130,6 @@ class EnrollmentFragment : Fragment() {
             binding.btnTakePhoto.visibility = View.VISIBLE
 
             binding.btnCancel.visibility = View.VISIBLE
-            binding.btnDone.visibility = View.VISIBLE
 
 
     }
@@ -256,12 +252,19 @@ class EnrollmentFragment : Fragment() {
             }
             orientationEventListener.enable()
 
+            val imageAnalyzer = ImageAnalysis.Builder().build().also {
+                it.setAnalyzer(ContextCompat.getMainExecutor(requireContext())) { imageProxy ->
+                    detectFaces(imageProxy)
+                }
+            }
+
             try {
                 processCameraProvider.unbindAll()
                 camera = processCameraProvider.bindToLifecycle(
                     this,
                     cameraSelector,
                     preview,
+                    imageAnalyzer,
                     imageCapture
                 )
                 camera.cameraControl.setZoomRatio(zoomFactor)
@@ -271,6 +274,39 @@ class EnrollmentFragment : Fragment() {
             }
 
         }, ContextCompat.getMainExecutor(requireContext()))
+    }
+
+    @androidx.camera.core.ExperimentalGetImage
+    private fun  detectFaces(imageProxy: ImageProxy) {
+        val mediaImage = imageProxy.image
+        if (mediaImage != null) {
+            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+            val options = FaceDetectorOptions.Builder()
+                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+                .setContourMode(FaceDetectorOptions.CONTOUR_MODE_NONE)
+                .build()
+            val detector = FaceDetection.getClient(options)
+
+            detector.process(image)
+                .addOnSuccessListener { faces ->
+                    if (faces.isNotEmpty()) {
+                        // Face detected
+                        binding.waringtvName.visibility = View.GONE
+                        binding.btnTakePhoto.isEnabled = true
+                    } else {
+                        // No face detected
+                        binding.waringtvName.visibility = View.VISIBLE
+                        binding.waringtvName.text = "No face detected"
+                        binding.btnTakePhoto.isEnabled = false
+
+                    }
+                    imageProxy.close()
+                }
+                .addOnFailureListener {
+                    // Handle failure
+                    imageProxy.close()
+                }
+        }
     }
 
 

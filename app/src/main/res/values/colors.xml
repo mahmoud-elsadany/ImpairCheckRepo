@@ -29,4 +29,5 @@
     <color name="icPressed">#AAFFFFFF</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="red">#FF0D00</color>
 </resources>

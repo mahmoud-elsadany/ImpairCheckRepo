@@ -22,6 +22,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/tvLeftRedPercentage"
         android:layout_marginBottom="@dimen/bottom_sheet_peek_height">
 
         <TextView
@@ -71,17 +72,17 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabGetContent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/mp_color_primary"
-        android:contentDescription="@null"
-        android:src="@drawable/ic_baseline_add_24"
-        android:layout_alignParentEnd="true"
-        android:layout_above="@+id/capture_eye_button"
-        app:tint="@android:color/white"
-        app:useCompatPadding="true" />
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/fabGetContent"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:backgroundTint="@color/mp_color_primary"-->
+<!--        android:contentDescription="@null"-->
+<!--        android:src="@drawable/ic_baseline_add_24"-->
+<!--        android:layout_alignParentEnd="true"-->
+<!--        android:layout_above="@+id/capture_eye_button"-->
+<!--        app:tint="@android:color/white"-->
+<!--        app:useCompatPadding="true" />-->
 
 
     <TextView
@@ -108,7 +109,16 @@
         android:id="@+id/capture_eye_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="capture eye"
+        android:layout_above="@+id/next_button"
+        android:text="capture bloodshot eye percentage" />
+
+
+    <Button
+        android:id="@+id/next_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Next test"
+        android:enabled="false"
         android:layout_alignParentBottom="true" />
 
 

@@ -90,7 +90,7 @@ class StartScreenFragment  : Fragment() {
         if (name.isEmpty() || id.isEmpty() ||  Constants.imageUri == null) {
             Toast.makeText(requireContext(), "Please fill all fields and capture an image", Toast.LENGTH_SHORT).show()
         } else {
-
+            findNavController().navigate(R.id.userProfileScreenFragment)
         }
     }
 
