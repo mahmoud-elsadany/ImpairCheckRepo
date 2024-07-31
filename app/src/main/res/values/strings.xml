@@ -56,6 +56,11 @@
     <string name="dialog_message">Please make sure to be on camera all the test journey and open your eyes and get close to camera. If you disappeared along the test you will fail immediately and need to retest again</string>
     <string name="dialog_title">Important</string>
     <string name="dialog_go_to_move_analysis_message">Make sure that the device is in a stand mode and the camera get your whole body to make sure that you apply the task</string>
+    <string name="first_pose_description">"You will stand on your **RIGHT LEG** for 15 seconds please follow the instructions below \n \n \n \n \n make sure that your whole body is visible to camera  "</string>
+    <string name="second_pose_description">"You will stand on your **LEFT LEG** for 15 seconds please follow the instructions below \n \n \n \n \n make sure that your whole body is visible to camera  "</string>
+    <string name="make_sure_first_pose_visible">Stand on your right leg and show your whole body</string>
+    <string name="make_sure_second_pose_visible">Stand on your left leg and show your whole body</string>
+    <string name="finish_description">Thank you for doing this test click Next to move to next step</string>
 
     <string-array name="delegate_spinner_titles">
         <item>CPU</item>

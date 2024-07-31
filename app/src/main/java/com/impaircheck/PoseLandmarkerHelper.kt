@@ -16,6 +16,10 @@ import com.google.mediapipe.tasks.core.Delegate
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.time.delay
 
 class PoseLandmarkerHelper(
     var minPoseDetectionConfidence: Float = com.impaircheck.PoseLandmarkerHelper.Companion.DEFAULT_POSE_DETECTION_CONFIDENCE,
@@ -23,7 +27,7 @@ class PoseLandmarkerHelper(
     var minPosePresenceConfidence: Float = com.impaircheck.PoseLandmarkerHelper.Companion.DEFAULT_POSE_PRESENCE_CONFIDENCE,
     var currentModel: Int = com.impaircheck.PoseLandmarkerHelper.Companion.MODEL_POSE_LANDMARKER_FULL,
     var currentDelegate: Int = com.impaircheck.PoseLandmarkerHelper.Companion.DELEGATE_CPU,
-    var runningMode: RunningMode = RunningMode.IMAGE,
+    var runningMode: RunningMode = RunningMode.LIVE_STREAM,
     val context: Context,
     // this listener is only used when running in RunningMode.LIVE_STREAM
     val poseLandmarkerHelperListener: com.impaircheck.PoseLandmarkerHelper.LandmarkerListener? = null
@@ -61,6 +65,7 @@ class PoseLandmarkerHelper(
             com.impaircheck.PoseLandmarkerHelper.Companion.DELEGATE_CPU -> {
                 baseOptionBuilder.setDelegate(Delegate.CPU)
             }
+
             com.impaircheck.PoseLandmarkerHelper.Companion.DELEGATE_GPU -> {
                 baseOptionBuilder.setDelegate(Delegate.GPU)
             }
@@ -85,6 +90,7 @@ class PoseLandmarkerHelper(
                     )
                 }
             }
+
             else -> {
                 // no-op
             }
@@ -118,7 +124,8 @@ class PoseLandmarkerHelper(
                         "details"
             )
             Log.e(
-                com.impaircheck.PoseLandmarkerHelper.Companion.TAG, "MediaPipe failed to load the task with error: " + e
+                com.impaircheck.PoseLandmarkerHelper.Companion.TAG,
+                "MediaPipe failed to load the task with error: " + e
                     .message
             )
         } catch (e: RuntimeException) {
@@ -333,6 +340,7 @@ class PoseLandmarkerHelper(
         val finishTimeMs = SystemClock.uptimeMillis()
         val inferenceTime = finishTimeMs - result.timestampMs()
 
+
         poseLandmarkerHelperListener?.onResults(
             com.impaircheck.PoseLandmarkerHelper.ResultBundle(
                 listOf(result),
@@ -341,6 +349,8 @@ class PoseLandmarkerHelper(
                 input.width
             )
         )
+
+
     }
 
     // Return errors thrown during detection to this PoseLandmarkerHelper's
@@ -375,7 +385,11 @@ class PoseLandmarkerHelper(
     )
 
     interface LandmarkerListener {
-        fun onError(error: String, errorCode: Int = com.impaircheck.PoseLandmarkerHelper.Companion.OTHER_ERROR)
+        fun onError(
+            error: String,
+            errorCode: Int = com.impaircheck.PoseLandmarkerHelper.Companion.OTHER_ERROR
+        )
+
         fun onResults(resultBundle: com.impaircheck.PoseLandmarkerHelper.ResultBundle)
     }
 }

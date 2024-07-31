@@ -3,6 +3,8 @@ package com.impaircheck.fragment
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -22,7 +24,12 @@ import com.google.mediapipe.tasks.components.containers.NormalizedLandmark
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.impaircheck.MainViewModel
 import com.impaircheck.PoseLandmarkerHelper
+import com.impaircheck.R
 import com.impaircheck.databinding.FragmentMoveAnalysisBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.time.delay
 import java.lang.Math.toDegrees
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -39,10 +46,9 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
         private const val TAG = "Pose Landmarker"
     }
 
-    private var _fragmentCameraBinding: FragmentMoveAnalysisBinding? = null
+    private var isStarted: Boolean = false
+    private lateinit var fragmentCameraBinding: FragmentMoveAnalysisBinding
 
-    private val fragmentCameraBinding
-        get() = _fragmentCameraBinding!!
 
     private lateinit var poseLandmarkerHelper: PoseLandmarkerHelper
     private val viewModel: MainViewModel by activityViewModels()
@@ -50,10 +56,18 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
-    private var cameraFacing = CameraSelector.LENS_FACING_BACK
+    private var cameraFacing = CameraSelector.LENS_FACING_FRONT
 
     /** Blocking ML operations are performed using this executor */
     private lateinit var backgroundExecutor: ExecutorService
+
+
+    //first pose is stand on left leg
+    //second pose is stand on right leg
+    private var currentPose: Int = 1
+    private var timer: CountDownTimer? = null
+    private var lastExecutionTime: Long = 0
+
 
     override fun onResume() {
         super.onResume()
@@ -80,13 +94,12 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
             viewModel.setMinPosePresenceConfidence(poseLandmarkerHelper.minPosePresenceConfidence)
             viewModel.setPoseDelegate(poseLandmarkerHelper.currentDelegate)
 
-            // Close the PoseLandmarkerHelper and release resources
+            // Close the PoseLandMarkerHelper and release resources
             backgroundExecutor.execute { poseLandmarkerHelper.clearPoseLandmarker() }
         }
     }
 
     override fun onDestroyView() {
-        _fragmentCameraBinding = null
         super.onDestroyView()
 
         // Shut down our background executor
@@ -101,7 +114,7 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _fragmentCameraBinding =
+        fragmentCameraBinding =
             FragmentMoveAnalysisBinding.inflate(inflater, container, false)
 
         return fragmentCameraBinding.root
@@ -113,6 +126,9 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
 
         // Initialize our background executor
         backgroundExecutor = Executors.newSingleThreadExecutor()
+
+
+        handleUI()
 
         // Wait for the views to be properly laid out
         fragmentCameraBinding.viewFinder.post {
@@ -131,6 +147,32 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
                 currentDelegate = viewModel.currentPoseDelegate,
                 poseLandmarkerHelperListener = this
             )
+        }
+
+    }
+
+    private fun handleUI() {
+
+        fragmentCameraBinding.startFirstPoseButton.setOnClickListener {
+            cancelCountdown()
+            isStarted = false
+            fragmentCameraBinding.firstPoseDescriptionLayout.visibility = View.GONE
+            fragmentCameraBinding.secondPoseDescriptionLayout.visibility = View.GONE
+            fragmentCameraBinding.finishDescriptionLayout.visibility = View.GONE
+            currentPose = 1
+        }
+
+        fragmentCameraBinding.startSecondPoseButton.setOnClickListener {
+            cancelCountdown()
+            isStarted = false
+            fragmentCameraBinding.firstPoseDescriptionLayout.visibility = View.GONE
+            fragmentCameraBinding.secondPoseDescriptionLayout.visibility = View.GONE
+            fragmentCameraBinding.finishDescriptionLayout.visibility = View.GONE
+            currentPose = 2
+        }
+
+        fragmentCameraBinding.nextButton.setOnClickListener {
+            //navigate to next fragment
         }
 
     }
@@ -219,8 +261,8 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
     override fun onResults(
         resultBundle: PoseLandmarkerHelper.ResultBundle
     ) {
-        activity?.runOnUiThread {
-            if (_fragmentCameraBinding != null) {
+        GlobalScope.launch(Dispatchers.Main) {
+            if (fragmentCameraBinding != null) {
 
                 // Pass necessary information to OverlayView for drawing on the canvas
                 if (resultBundle.poseResults.isNotEmpty()) {
@@ -260,20 +302,55 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
 
 
                         if (resultBundle.poseResults.first().landmarks().first().size == 33) {
-                            val (isStanding, leg) = isStandingOnOneLeg(
-                                resultBundle.poseResults.first().landmarks().first()
-                            )
 
-                            println("Is standing on one leg: $isStanding")
-                            println("Standing on: $leg")
+                            val currentTime = System.currentTimeMillis()
 
-                            fragmentCameraBinding.rightLegPoseText.text =
-                                "Is standing on one leg: $isStanding"
+                            if (currentTime - lastExecutionTime >= 1000) {
+                                // Code to be executed
 
-                            fragmentCameraBinding.leftLegPoseText.text = "Standing on: $leg"
+                                val (isStanding, leg) = isStandingOnOneLeg(
+                                    resultBundle.poseResults.first().landmarks().first()
+                                )
+                                println("isStanding: $isStanding, leg: $leg")
+                                if (currentPose == leg) {
+                                    isStarted = true
+                                    startCountdown()
+                                } else {
+                                    cancelCountdown()
+                                    fragmentCameraBinding.PoseHintTextView.text = if (currentPose == 1)
+                                        getString(R.string.make_sure_first_pose_visible) else getString(
+                                        R.string.make_sure_second_pose_visible
+                                    )
+
+                                }
+
+
+                                lastExecutionTime = currentTime
+                            }
+
+
+
+                        } else {
+                            cancelCountdown()
+                            fragmentCameraBinding.PoseHintTextView.text = if (currentPose == 1)
+                                getString(R.string.make_sure_first_pose_visible) else getString(R.string.make_sure_second_pose_visible)
+
                         }
 
+
+                    } else {
+                        cancelCountdown()
+                        fragmentCameraBinding.PoseHintTextView.text = if (currentPose == 1)
+                            getString(R.string.make_sure_first_pose_visible) else getString(R.string.make_sure_second_pose_visible)
+
+
                     }
+
+                } else {
+                    cancelCountdown()
+                    fragmentCameraBinding.PoseHintTextView.text = if (currentPose == 1)
+                        getString(R.string.make_sure_first_pose_visible) else getString(R.string.make_sure_second_pose_visible)
+
 
                 }
 
@@ -284,6 +361,45 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
     }
 
     data class Point3D(val x: Float, val y: Float, val z: Float)
+
+
+    private fun startCountdown() {
+
+        timer = object : CountDownTimer(15000, 1000) {
+
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsRemaining = (millisUntilFinished / 1000) % 60
+                fragmentCameraBinding.PoseHintTextView.text = "$secondsRemaining seconds remaining"
+            }
+
+            override fun onFinish() {
+                if (currentPose == 1) {
+                    fragmentCameraBinding.PoseHintTextView.text = "first pose Finished"
+                    fragmentCameraBinding.firstPoseDescriptionLayout.visibility = View.GONE
+                    fragmentCameraBinding.secondPoseDescriptionLayout.visibility = View.VISIBLE
+                } else {
+                    fragmentCameraBinding.PoseHintTextView.text = "second pose Finished"
+                    fragmentCameraBinding.firstPoseDescriptionLayout.visibility = View.GONE
+                    fragmentCameraBinding.secondPoseDescriptionLayout.visibility = View.GONE
+
+                    if (isStarted)
+                        fragmentCameraBinding.finishDescriptionLayout.visibility = View.VISIBLE
+
+
+                }
+            }
+
+        }
+        timer?.start()
+
+
+    }
+
+
+    private fun cancelCountdown() {
+//        fragmentCameraBinding.PoseTimeTextView.visibility = View.GONE
+        timer?.cancel() // Cancel the countdown
+    }
 
 
     //version 1
@@ -380,7 +496,10 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
     //version 3
     private fun isStandingOnOneLeg(
         poseLandmarks: List<NormalizedLandmark>,
-    ): Pair<Boolean, String?> {
+    ): Pair<Boolean, Int> {
+
+        //1 - stand on left leg
+        //2 - stand on right leg
 
         val leftHip = Point3D(poseLandmarks[23].x(), poseLandmarks[23].y(), poseLandmarks[23].z())
         val leftKnee = Point3D(poseLandmarks[25].x(), poseLandmarks[25].y(), poseLandmarks[25].z())
@@ -467,20 +586,20 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
         return when {
             leftLegStraight && !footAligned && !rightLegStraight && !kneesAligned -> Pair(
                 true,
-                "Left Leg"
+                1
             )
 
             rightLegStraight && !footAligned && !leftLegStraight && !kneesAligned -> Pair(
                 true,
-                "Right Leg"
+                2
             )
 
             rightLegStraight && footAligned && leftLegStraight && kneesAligned -> Pair(
                 true,
-                "Both Legs"
+                0
             )
 
-            else -> Pair(false, null)
+            else -> Pair(false, -1)
         }
     }
 
