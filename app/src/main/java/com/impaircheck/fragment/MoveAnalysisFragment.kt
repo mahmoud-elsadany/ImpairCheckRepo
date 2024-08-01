@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -56,7 +57,7 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
-    private var cameraFacing = CameraSelector.LENS_FACING_FRONT
+    private var cameraFacing = CameraSelector.LENS_FACING_BACK
 
     /** Blocking ML operations are performed using this executor */
     private lateinit var backgroundExecutor: ExecutorService
@@ -65,9 +66,11 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
     //first pose is stand on left leg
     //second pose is stand on right leg
     private var currentPose: Int = 1
-    private var timer: CountDownTimer? = null
     private var lastExecutionTime: Long = 0
 
+    private var handler: Handler? = null
+    private var runnable: Runnable? = null
+    private var secondsInPose = 0
 
     override fun onResume() {
         super.onResume()
@@ -311,7 +314,7 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
                                 val (isStanding, leg) = isStandingOnOneLeg(
                                     resultBundle.poseResults.first().landmarks().first()
                                 )
-                                println("isStanding: $isStanding, leg: $leg")
+                                println("isStanding: $isStanding, leg: $leg , $lastExecutionTime " )
                                 if (currentPose == leg) {
                                     isStarted = true
                                     startCountdown()
@@ -365,32 +368,99 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
 
     private fun startCountdown() {
 
-        timer = object : CountDownTimer(15000, 1000) {
+//        timer = object : CountDownTimer(15000, 1000) {
+//
+//            override fun onTick(millisUntilFinished: Long) {
+//                val secondsRemaining = (millisUntilFinished / 1000) % 60
+//                fragmentCameraBinding.PoseHintTextView.text = "$secondsRemaining seconds remaining"
+//            }
+//
+//            override fun onFinish() {
+//                if (currentPose == 1) {
+//                    fragmentCameraBinding.PoseHintTextView.text = "first pose Finished"
+//                    fragmentCameraBinding.firstPoseDescriptionLayout.visibility = View.GONE
+//                    fragmentCameraBinding.secondPoseDescriptionLayout.visibility = View.VISIBLE
+//                } else {
+//                    fragmentCameraBinding.PoseHintTextView.text = "second pose Finished"
+//                    fragmentCameraBinding.firstPoseDescriptionLayout.visibility = View.GONE
+//                    fragmentCameraBinding.secondPoseDescriptionLayout.visibility = View.GONE
+//
+//                    if (isStarted)
+//                        fragmentCameraBinding.finishDescriptionLayout.visibility = View.VISIBLE
+//
+//
+//                }
+//            }
+//
+//        }
+//        timer?.start()
 
-            override fun onTick(millisUntilFinished: Long) {
-                val secondsRemaining = (millisUntilFinished / 1000) % 60
-                fragmentCameraBinding.PoseHintTextView.text = "$secondsRemaining seconds remaining"
-            }
+//        countdownTimer?.cancel()  // Cancel any existing timer
+//        countdownTimer = object : CountDownTimer(15000, 1000) {  // 10 seconds with 1 second interval
+//            override fun onTick(millisUntilFinished: Long) {
+//                secondsInPose++
+//                // Update UI or handle logic for each second
+//                println("Seconds in pose: $secondsInPose")
+//                fragmentCameraBinding.PoseHintTextView.text = "$secondsInPose seconds in pose"
+//            }
+//
+//            override fun onFinish() {
+//                // Handle completion logic
+//                println("Completed 10 seconds in pose")
+//
+//                if (currentPose == 1) {
+//                    fragmentCameraBinding.PoseHintTextView.text = "first pose Finished"
+//                    fragmentCameraBinding.firstPoseDescriptionLayout.visibility = View.GONE
+//                    fragmentCameraBinding.secondPoseDescriptionLayout.visibility = View.VISIBLE
+//                } else {
+//                    fragmentCameraBinding.PoseHintTextView.text = "second pose Finished"
+//                    fragmentCameraBinding.firstPoseDescriptionLayout.visibility = View.GONE
+//                    fragmentCameraBinding.secondPoseDescriptionLayout.visibility = View.GONE
+//
+//                    if (isStarted)
+//                        fragmentCameraBinding.finishDescriptionLayout.visibility = View.VISIBLE
+//
+//
+//                }
+//            }
+//        }.start()
 
-            override fun onFinish() {
-                if (currentPose == 1) {
-                    fragmentCameraBinding.PoseHintTextView.text = "first pose Finished"
-                    fragmentCameraBinding.firstPoseDescriptionLayout.visibility = View.GONE
-                    fragmentCameraBinding.secondPoseDescriptionLayout.visibility = View.VISIBLE
+
+//        handler?.removeCallbacks(runnable!!)  // Remove any existing callbacks
+//        secondsInPose = 0  // Reset the counter
+
+        handler = Handler(Looper.getMainLooper())
+        runnable = object : Runnable {
+            override fun run() {
+                secondsInPose++
+                // Update UI or handle logic for each second
+                println("Seconds in pose: $secondsInPose")
+                fragmentCameraBinding.PoseHintTextView.text = "$secondsInPose seconds in pose"
+
+                // Check if 10 seconds have passed
+                if (secondsInPose > 15) {
+                    // Handle completion logic
+                    println("Completed 15 seconds in pose")
+                    if (currentPose == 1) {
+                        fragmentCameraBinding.PoseHintTextView.text = "first pose Finished"
+                        fragmentCameraBinding.firstPoseDescriptionLayout.visibility = View.GONE
+                        fragmentCameraBinding.secondPoseDescriptionLayout.visibility = View.VISIBLE
+                    } else {
+                        fragmentCameraBinding.PoseHintTextView.text = "second pose Finished"
+                        fragmentCameraBinding.firstPoseDescriptionLayout.visibility = View.GONE
+                        fragmentCameraBinding.secondPoseDescriptionLayout.visibility = View.GONE
+
+                        if (isStarted)
+                            fragmentCameraBinding.finishDescriptionLayout.visibility = View.VISIBLE
+
+
+                    }
                 } else {
-                    fragmentCameraBinding.PoseHintTextView.text = "second pose Finished"
-                    fragmentCameraBinding.firstPoseDescriptionLayout.visibility = View.GONE
-                    fragmentCameraBinding.secondPoseDescriptionLayout.visibility = View.GONE
-
-                    if (isStarted)
-                        fragmentCameraBinding.finishDescriptionLayout.visibility = View.VISIBLE
-
-
+                    handler?.postDelayed(this, 1000)  // Repeat every second
                 }
             }
-
         }
-        timer?.start()
+        handler?.post(runnable!!)
 
 
     }
@@ -398,7 +468,15 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
 
     private fun cancelCountdown() {
 //        fragmentCameraBinding.PoseTimeTextView.visibility = View.GONE
-        timer?.cancel() // Cancel the countdown
+        handler?.removeCallbacks(runnable!!)
+        handler = null
+        runnable = null
+        secondsInPose = 0  // Optionally reset the counter
+        // Update UI or handle logic for cancelation
+        println("Countdown cancelled")
+        secondsInPose = 0  // Optionally reset the counter
+        // Update UI or handle logic for cancelation
+        println("Countdown cancelled") // Cancel the countdown
     }
 
 
