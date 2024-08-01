@@ -21,6 +21,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.google.mediapipe.tasks.components.containers.NormalizedLandmark
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.impaircheck.MainViewModel
@@ -176,6 +177,7 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
 
         fragmentCameraBinding.nextButton.setOnClickListener {
             //navigate to next fragment
+            findNavController().navigate(R.id.questionnaire_fragment)
         }
 
     }
