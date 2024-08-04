@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "72319237882",
+    "firebase_url": "https://impaircheck-default-rtdb.firebaseio.com",
+    "project_id": "impaircheck",
+    "storage_bucket": "impaircheck.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:72319237882:android:5deeab86045a25d7805343",
+        "android_client_info": {
+          "package_name": "com.impaircheck"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4cYp9LmuWY07ge9y9qCzBtMyGrwrl9Fc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
