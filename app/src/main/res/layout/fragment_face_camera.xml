@@ -17,6 +17,7 @@
 
     </androidx.camera.view.PreviewView>
 
+
     <com.ml.quaterion.facenetdetection.BoundingBoxOverlay
         android:id="@+id/bbox_overlay"
         android:layout_width="0dp"
@@ -26,6 +27,13 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Overlay view to draw the frame -->
+    <com.impaircheck.overlays.FaceFrameOverlayView
+        android:id="@+id/overlayView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 
     <ImageView
         android:id="@+id/capture_button"

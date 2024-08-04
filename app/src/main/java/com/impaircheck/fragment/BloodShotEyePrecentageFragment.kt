@@ -393,8 +393,12 @@ class BloodShotEyePrecentageFragment : Fragment(), FaceLandmarkerHelper.Landmark
 
                 fragmentGalleryBinding.nextButton.isEnabled = true
 
-            } else
-                Toast.makeText(requireContext(), "Face not detected", Toast.LENGTH_SHORT).show()
+            } else{
+                findNavController().popBackStack(R.id.userProfileScreenFragment,true)
+
+                Toast.makeText(requireContext(), "Face not detected pls re-try again", Toast.LENGTH_SHORT).show()
+
+            }
 
         }
     }

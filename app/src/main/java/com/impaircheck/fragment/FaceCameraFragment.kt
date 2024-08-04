@@ -323,8 +323,12 @@ class FaceCameraFragment: Fragment(), FaceAnalyserRepo {
                 Logger.log("The selected folder doesn't contain any directories. Make sure that the file structure is as described in the README of the project and then restart the app.")
             }
             if (!errorFound) {
-                fileReader.run(images, fileReaderCallback)
-                Logger.log("Detecting faces in ${images.size} images ...")
+                try {
+                    fileReader.run(images, fileReaderCallback)
+                } catch (e: Exception) {
+                    Logger.log("Error while parsing image file")
+                    findNavController().popBackStack(R.id.userProfileScreenFragment, false)
+                }
             } else {
                 val alertDialog = AlertDialog.Builder(requireContext()).apply {
                     setTitle("Error while parsing directory")
@@ -374,15 +378,18 @@ class FaceCameraFragment: Fragment(), FaceAnalyserRepo {
     override fun theDetectedUser(name: String) {
 
 
-        if (unknownTrials == 5) {
-            showWarningDialog()
-        }
+        println("The detected user in camera is $name")
 
-        if (name != "User") {
-            unknownTrials += 1
-            cameraBinding.textView.text = "Please stop cheating and show your face .. you have ${5 - unknownTrials} trials left"
-        }else{
-            unknownTrials = 0
+        if (unknownTrials >= 5) {
+            showWarningDialog()
+        } else {
+            if (name != "User") {
+                unknownTrials += 1
+                cameraBinding.textView.text =
+                    "Please stop cheating and show your face .. you have ${5 - unknownTrials} trials left"
+            } else {
+                unknownTrials = 0
+            }
         }
 
 
@@ -400,6 +407,7 @@ class FaceCameraFragment: Fragment(), FaceAnalyserRepo {
             setMessage("The detected user is not you. Please stop cheating.")
             setCancelable(false)
             setPositiveButton("OK") { dialog, which ->
+                unknownTrials = 0
                 dialog.dismiss()
             }
             create()

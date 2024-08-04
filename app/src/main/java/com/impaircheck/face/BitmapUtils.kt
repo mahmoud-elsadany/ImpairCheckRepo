@@ -44,11 +44,17 @@ class BitmapUtils {
                 height = source.height - rect.top
             }
 
+            try {
+                val croppedBitmap = Bitmap.createBitmap( source , rect.left , rect.top , width , height )
+                // Uncomment the below line if you want to save the input image.
+                // BitmapUtils.saveBitmap( context , croppedBitmap , "source" )
+                return croppedBitmap
+            } catch ( e: IllegalArgumentException ){
+                Log.e("BitmapUtils", "IllegalArgumentException in cropRectFromBitmap()")
+                return source
+            }
 
-            val croppedBitmap = Bitmap.createBitmap( source , rect.left , rect.top , width , height )
-            // Uncomment the below line if you want to save the input image.
-            // BitmapUtils.saveBitmap( context , croppedBitmap , "source" )
-            return croppedBitmap
+
         }
 
 

@@ -16,12 +16,14 @@ import android.view.OrientationEventListener
 import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -42,6 +44,9 @@ import com.google.ai.client.generativeai.type.asTextOrNull
 import com.google.ai.client.generativeai.type.content
 import com.google.ai.client.generativeai.type.generationConfig
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.impaircheck.BuildConfig
 import com.impaircheck.R
 import com.impaircheck.compose.ChatScreen
@@ -73,6 +78,7 @@ class QuestionnaireFragment : Fragment(), FaceAnalyserRepo {
 
 
     private var unknownTrials: Int = 0
+    private var noFaceTrials: Int = 0
 
     private lateinit var cameraBinding: FragmentQuestionnaireBinding
     private lateinit var previewView: PreviewView
@@ -118,10 +124,11 @@ class QuestionnaireFragment : Fragment(), FaceAnalyserRepo {
             },
             systemInstruction = content {
                 text(
-                    "\n### Interaction Guidelines\n1. **Introduction and Consent**\n   - Greet the user and introduce yourself as an assessment tool.\n   - Explain the purpose of the assessment clearly.\n   - Ask for the user's consent to proceed with the questions.\n   - Ask for the user one question at a time \n\n2. **Questionnaire**\n   - **Basic Information**\n     - Ask for basic information such as age and gender.\n   - **Physical Symptoms**\n     - Inquire about physical symptoms such as dizziness, blurred vision, slurred speech, or lack of coordination.\n   - **Mental State**\n     - Ask questions related to their mental state, such as feelings of confusion, difficulty concentrating, or memory issues.\n   - **Behavioral Indicators**\n     - Assess their recent behavior by asking if they have been more talkative, less inhibited, or engaging in risky activities.\n   - **Substance Use**\n     - Directly ask if they have consumed alcohol or drugs recently. If yes, inquire about the type, amount, and time of consumption.\n   - **Self-Assessment**\n     - Ask the user to rate their own perceived level of impairment on a scale (e.g., 1 to 10).\n\n3. **Response Analysis**\n   - Implement logic to analyze the user's responses for key indicators of impairment.\n   - Use predefined thresholds and patterns in the answers to determine the likelihood of impairment.\n\n4. **Result and Advice**\n   - Provide the user with a result based on the analysis (e.g., likely impaired, possibly impaired, unlikely impaired).\n\n5. **Confidentiality and Privacy**\n   - Ensure the user that their responses are confidential and will not be shared with third parties.\n   - Explain how their data will be used and stored securely.\n\n6. **Follow-Up**\n   - Optionally, offer the user a chance to retake the assessment after a certain period.\n\n### Sample Questions\n1. **Basic Information**\n   - \"Please provide your age.\"\n   - \"What is your gender?\"\n   - \"What is the date today?”” Check if the answer is right from calendar\n   - \"What is your birthdate?” Check if the answer is right from the previous answers of his age \n\n2. **Physical Symptoms**\n   - \"Are you experiencing dizziness or blurred vision?\"\n   - \"Is your speech slurred or difficult to understand?\"\n\n3. **Mental State**\n   - \"Are you feeling confused or having trouble concentrating?\"\n   - \"Do you have difficulty remembering recent events?\"\n\n4. **Behavioral Indicators**\n   - \"Have you noticed a change in your level of inhibition or risk-taking behavior?\"\n   - \"Have you been more talkative or outgoing than usual?\"\n\n5. **Substance Use**\n   - \"Have you consumed alcohol or drugs in the past few hours? If yes, please specify.\"\n   - \"How much did you consume and at what time?\"\n\n6. **Self-Assessment**\n   - \"On a scale from 1 to 10, how impaired do you feel right now?\"\n\n### Implementation Notes\n- Use clear, simple language to ensure the questions are easily understood.\n- Allow the user to skip questions if they feel uncomfortable answering.\n- Provide feedback and reassurance throughout the assessment to keep the user engaged.\n- Ask the user one question at a time \n"
+                    "\n### Interaction Guidelines\n1. **Introduction and Consent**\n   - Greet the user and introduce yourself as an assessment tool.\n   - Explain the purpose of the assessment clearly.\n   - Ask for the user's consent to proceed with the questions.\n   - Ask for the user one question at a time \n\n2. **Questionnaire**\n   - **Basic Information**\n     - Ask for basic information such as age and gender.\n   - **Physical Symptoms**\n     - Inquire about physical symptoms such as dizziness, blurred vision, slurred speech, or lack of coordination.\n   - **Mental State**\n     - Ask questions related to their mental state, such as feelings of confusion, difficulty concentrating, or memory issues.\n   - **Behavioral Indicators**\n     - Assess their recent behavior by asking if they have been more talkative, less inhibited, or engaging in risky activities.\n   - **Substance Use**\n     - Directly ask if they have consumed alcohol or drugs recently. If yes, inquire about the type, amount, and time of consumption.\n   - **Self-Assessment**\n     - Ask the user to rate their own perceived level of impairment on a scale (e.g., 1 to 10).\n\n3. **Response Analysis**\n   - Implement logic to analyze the user's responses for key indicators of impairment.\n\n\n5. **Confidentiality and Privacy**\n   - Ensure the user that their responses are confidential and will not be shared with third parties.\n   - Explain how their data will be used and stored securely.\n\n\n### Sample Questions\n1. **Basic Information**\n   - \"Please provide your age.\"\n   - \"What is your gender?\"\n   - \"What is the date today?”” Check if the answer is right from calendar\n   - \"What is your birthdate?” Check if the answer is right from the previous answers of his age \n\n2. **Physical Symptoms**\n   - \"Are you experiencing dizziness or blurred vision?\"\n   - \"Is your speech slurred or difficult to understand?\"\n\n3. **Mental State**\n   - \"Are you feeling confused or having trouble concentrating?\"\n   - \"Do you have difficulty remembering recent events?\"\n\n4. **Behavioral Indicators**\n   - \"Have you noticed a change in your level of inhibition or risk-taking behavior?\"\n   - \"Have you been more talkative or outgoing than usual?\"\n\n5. **Substance Use**\n   - \"Have you consumed alcohol or drugs in the past few hours? If yes, please specify.\"\n   - \"How much did you consume and at what time?\"\n\n6. **Self-Assessment**\n   - \"On a scale from 1 to 10, how impaired do you feel right now?\"\n\n### Implementation Notes\n- Use clear, simple language to ensure the questions are easily understood.\n- Allow the user to skip questions if they feel uncomfortable answering.\n- Provide feedback and reassurance throughout the assessment to keep the user engaged.\n- make it max 7 questions\n- Ask the user one question at a time \n"
                 )
-            }
-        )
+            },
+
+            )
 
         sendMessage("hi")
     }
@@ -187,6 +194,11 @@ class QuestionnaireFragment : Fragment(), FaceAnalyserRepo {
             response.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.asTextOrNull()?.let {
                 messages.add("Bot: $it")
                 chatHistory.add(content("model") { text(it) })
+
+                if (it.contains("Thank you for")) {
+                    showCompletedDialog()
+                }
+
             }
         }
     }
@@ -242,6 +254,8 @@ class QuestionnaireFragment : Fragment(), FaceAnalyserRepo {
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
+
+
         imageFrameAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), frameAnalyser)
         cameraProvider.bindToLifecycle(
             this as LifecycleOwner,
@@ -374,7 +388,12 @@ class QuestionnaireFragment : Fragment(), FaceAnalyserRepo {
                 Logger.log("The selected folder doesn't contain any directories. Make sure that the file structure is as described in the README of the project and then restart the app.")
             }
             if (!errorFound) {
-                fileReader.run(images, fileReaderCallback)
+                try {
+                    fileReader.run(images, fileReaderCallback)
+                } catch (e: Exception) {
+                    Logger.log("Error while parsing image file")
+                    findNavController().popBackStack(R.id.userProfileScreenFragment, false)
+                }
                 Logger.log("Detecting faces in ${images.size} images ...")
             } else {
                 val alertDialog = AlertDialog.Builder(requireContext()).apply {
@@ -424,42 +443,85 @@ class QuestionnaireFragment : Fragment(), FaceAnalyserRepo {
 
     override fun theDetectedUser(name: String) {
 
+        println("The detected user in camera is $name")
 
         if (unknownTrials >= 5) {
             showWarningDialog()
-        }else{
+        } else {
             if (name != "User") {
                 unknownTrials += 1
-                cameraBinding.textView.text =
-                    "Please stop cheating and show your face .. you have ${5 - unknownTrials} trials left"
             } else {
                 unknownTrials = 0
             }
         }
 
 
-
-
     }
 
     override fun numberOfFacesDetected(number: Int) {
+        println("The number of faces detected is $number")
+        if (number == 0) {
+            // No face detected
 
+            if (noFaceTrials >= 5) {
+                showNotShowingFaceDialog()
+            } else {
+                noFaceTrials += 1
+
+            }
+
+        } else {
+            noFaceTrials = 0
+        }
     }
 
 
     // make a function that Show a warning dialog if the detected user is not the user and please stop cheating
     private fun showWarningDialog() {
+
+        cameraBinding.warningLayout.visibility = View.VISIBLE
+        cameraBinding.warningOverlayView.visibility = View.VISIBLE
+        cameraBinding.warningTitle.text = "Warning"
+        cameraBinding.warningMessage.text = "The detected user is not you. Please stop cheating."
+        cameraBinding.warningButton.setOnClickListener {
+            cameraBinding.warningLayout.visibility = View.GONE
+            cameraBinding.warningOverlayView.visibility = View.GONE
+            unknownTrials = 0
+        }
+
+    }
+
+    //make a funcrtion that show a dialog that the user has completed the questionnaire
+    private fun showCompletedDialog() {
         val alertDialog = AlertDialog.Builder(requireContext()).apply {
-            setTitle("Warning")
-            setMessage("The detected user is not you. Please stop cheating.")
+            setTitle("Completed")
+            setMessage("Thank you for completing the questionnaire.")
             setCancelable(false)
             setPositiveButton("OK") { dialog, which ->
-                unknownTrials = 0
                 dialog.dismiss()
+
+                //pop the back stack to the user profile fragment
+                findNavController().popBackStack(R.id.userProfileScreenFragment, true)
             }
             create()
         }
         alertDialog.show()
+    }
+
+    // make a function that show a dialog that warn of not showing a face who is doing the exam
+    private fun showNotShowingFaceDialog() {
+
+        cameraBinding.warningLayout.visibility = View.VISIBLE
+        cameraBinding.warningOverlayView.visibility = View.VISIBLE
+        cameraBinding.warningTitle.text = "Warning"
+        cameraBinding.warningMessage.text = "Please show your face to the camera."
+        cameraBinding.warningButton.setOnClickListener {
+            cameraBinding.warningLayout.visibility = View.GONE
+            cameraBinding.warningOverlayView.visibility = View.GONE
+            findNavController().popBackStack(R.id.questionnaire_fragment, false)
+        }
+
+
     }
 
 

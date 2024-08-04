@@ -12,7 +12,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent">
 
 
     </androidx.camera.view.PreviewView>
@@ -28,27 +28,60 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-
-
-
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/compose_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    <TextView
-        android:id="@+id/textView"
+
+    <View
+        android:id="@+id/warning_overlay_view"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        tools:visibility="visible"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/warning_layout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:text="Unknown"
-        android:textStyle="bold"
-        android:textColor="@color/white"
-        android:textSize="15sp"/>
+        android:layout_centerInParent="true"
+        android:background="@android:color/white"
+        android:elevation="5dp"
+        android:padding="20dp"
+        tools:visibility="visible"
+        android:visibility="gone">
 
 
+        <TextView
+            android:id="@+id/warning_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Warning"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/warning_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/warning_title"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="Please show your face to the camera." />
+
+        <Button
+            android:id="@+id/warning_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/warning_message"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:text="OK" />
+
+    </RelativeLayout>
 
 
 </RelativeLayout>
