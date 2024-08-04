@@ -47,6 +47,9 @@
     <string name="make_sure_first_pose_visible">Stand on your right leg and show your whole body</string>
     <string name="make_sure_second_pose_visible">Stand on your left leg and show your whole body</string>
     <string name="finish_description">Thank you for doing this test click Next to move to next step</string>
+    <string name="update_dialog_title">New update available</string>
+    <string name="update">update</string>
+    <string name="make_sure_to_update">make sure to update to latest app version</string>
 
     <string-array name="delegate_spinner_titles">
         <item>CPU</item>

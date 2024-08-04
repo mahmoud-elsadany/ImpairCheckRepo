@@ -128,5 +128,7 @@ dependencies {
     // Firebase
     implementation "com.google.firebase:firebase-crashlytics:19.0.3"
     implementation "com.google.firebase:firebase-analytics:21.2.0"
+    implementation("com.google.firebase:firebase-config:22.0.0")
+
 
 }
