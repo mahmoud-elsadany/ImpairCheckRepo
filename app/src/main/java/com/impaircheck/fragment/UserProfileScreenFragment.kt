@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import com.impaircheck.R
+import com.impaircheck.constants.IS_NEW_USER
 import com.impaircheck.databinding.FragmentStartScreenBinding
 import com.impaircheck.databinding.FragmentUserProfileBinding
 import com.impaircheck.fragment.RegistrationFragment.Companion.RESULT_KEY_URI
@@ -44,6 +45,7 @@ class UserProfileScreenFragment : Fragment() {
     private fun initViews() {
 
 
+        IS_NEW_USER = false
         binding.lastTestDate.text = getString(R.string.last_test_date) + " "
         binding.lastTestScore.text = getString(R.string.last_test_score) + " "
 

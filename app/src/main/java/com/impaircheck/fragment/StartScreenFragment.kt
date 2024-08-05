@@ -25,6 +25,7 @@ import com.google.gson.reflect.TypeToken
 import com.impaircheck.R
 import com.impaircheck.Utils.hideKeyboard
 import com.impaircheck.constants
+import com.impaircheck.constants.IS_NEW_USER
 import com.impaircheck.constants.fireBaseDatabase
 import com.impaircheck.databinding.FragmentStartScreenBinding
 import com.impaircheck.fragment.RegistrationFragment.Companion.RESULT_KEY_URI
@@ -82,7 +83,14 @@ class StartScreenFragment : Fragment() {
                 handleCheckUserExists()
             } else {
                 // Handle the case where the user does not exist
-                navigateToCamera(it)
+                if (!IS_NEW_USER) {
+                    Toast.makeText(
+                        requireContext(),
+                        "User with ID ${binding.editTextID.text} does not exist. Please generate a new ID.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }else
+                    navigateToCamera(it)
             }
 
 
@@ -92,11 +100,18 @@ class StartScreenFragment : Fragment() {
             val id = (100..999999).random()
             binding.editTextID.setText(id.toString())
             binding.editTextID.isEnabled = false
+            IS_NEW_USER = true
             newUserData = userDataItem(
                 id,
                 "",
                 binding.editTextName.text.toString()
             )
+
+            Toast.makeText(
+                requireContext(),
+                "memorize your ID to be able to login later with it: $id",
+                Toast.LENGTH_LONG
+            ).show()
         }
 
         binding.buttonSubmit.setOnClickListener {
@@ -106,6 +121,7 @@ class StartScreenFragment : Fragment() {
 //                    "User with ID ${binding.editTextID.text} already exists",
 //                    Toast.LENGTH_SHORT
 //                ).show()
+                findNavController().navigate(R.id.userProfileScreenFragment)
             } else
                 handleSubmitNewUser()
         }
@@ -122,7 +138,13 @@ class StartScreenFragment : Fragment() {
                     RESULT_KEY_URI, Uri::class.java
                 )
 
-            updateButtonStates()
+            println("is this new user: $IS_NEW_USER")
+
+            if (IS_NEW_USER)
+                uploadImageToFirebase(Constants.imageUri!!)
+            else
+                updateButtonStates()
+
         }
     }
 
@@ -140,7 +162,7 @@ class StartScreenFragment : Fragment() {
         } else {
             fireBaseDatabase.child("users").child(id).setValue(newUserData)
 
-//            findNavController().navigate(R.id.userProfileScreenFragment)
+            findNavController().navigate(R.id.userProfileScreenFragment)
         }
     }
 
@@ -149,10 +171,6 @@ class StartScreenFragment : Fragment() {
         val isNameFilled = binding.editTextName.text.isNotEmpty()
         val isIDFilled = binding.editTextID.text.isNotEmpty()
         val isImageCaptured = Constants.imageUri != null
-
-        if (isImageCaptured) {
-            uploadImageToFirebase(Constants.imageUri!!)
-        }
 
         binding.buttonCaptureImage.isEnabled = isNameFilled && isIDFilled
         binding.buttonSubmit.isEnabled = isNameFilled && isIDFilled && isImageCaptured
@@ -205,6 +223,7 @@ class StartScreenFragment : Fragment() {
     }
 
     private fun uploadImageToFirebase(imageUri: Uri) {
+        showLoading()
         val storageReference: StorageReference =
             FirebaseStorage.getInstance().reference.child("usersImages/${binding.editTextID.text}_${System.currentTimeMillis()}.jpg")
 
@@ -217,6 +236,10 @@ class StartScreenFragment : Fragment() {
                         uri.toString(),
                         binding.editTextName.text.toString()
                     )
+                    hideLoading()
+
+                    updateButtonStates()
+
                 }
             }
             .addOnFailureListener { exception ->
@@ -227,8 +250,7 @@ class StartScreenFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun downloadImageFromFirebase(imageLink: String) {
 
-
-
+        showLoading()
         Thread {
             try {
                 val future = Glide.with(this)
@@ -244,9 +266,10 @@ class StartScreenFragment : Fragment() {
                         val fileUri: Uri = Uri.fromFile(savedFile)
                         Log.d("MainActivity", "Image saved. URI: $fileUri")
                         // Do something with the URI, e.g., pass it to another activity or fragment
-
+                        hideLoading()
                         Constants.imageUri = fileUri
 
+                        navigateToCamera(requireView())
                     } else {
                         Log.e("MainActivity", "Failed to save image")
                     }
@@ -255,7 +278,6 @@ class StartScreenFragment : Fragment() {
                 e.printStackTrace()
             }
         }.start()
-
 
 
     }
@@ -272,4 +294,16 @@ class StartScreenFragment : Fragment() {
             null
         }
     }
+
+
+    private fun showLoading(){
+        binding.loadingLayout.visibility = View.VISIBLE
+        binding.loadingOverlayView.visibility = View.VISIBLE
+    }
+    private fun hideLoading(){
+        binding.loadingLayout.visibility = View.GONE
+        binding.loadingOverlayView.visibility = View.GONE
+    }
+
+
 }

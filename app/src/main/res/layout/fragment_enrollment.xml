@@ -86,14 +86,16 @@
                 android:src="@drawable/capture_icon"
                 app:tint="#ffffff" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@android:color/transparent"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/holo_red_dark"
                 android:padding="5dp"
+                android:textColor="@color/white"
                 android:text="Cancel"
                 android:textStyle="bold"
 
@@ -103,6 +105,57 @@
         </LinearLayout>
 
     </LinearLayout>
+
+
+    <View
+        android:id="@+id/warning_overlay_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        tools:visibility="visible"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/warning_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@android:color/white"
+        android:elevation="5dp"
+        android:padding="20dp"
+        tools:visibility="visible"
+        android:visibility="gone">
+
+
+        <TextView
+            android:id="@+id/warning_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Warning"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/warning_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/warning_title"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="Please show your face to the camera." />
+
+        <Button
+            android:id="@+id/warning_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/warning_message"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:text="OK" />
+
+    </RelativeLayout>
 
 
 </RelativeLayout>

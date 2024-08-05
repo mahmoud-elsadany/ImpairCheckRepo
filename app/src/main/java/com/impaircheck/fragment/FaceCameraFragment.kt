@@ -35,6 +35,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.findNavController
 import com.google.common.util.concurrent.ListenableFuture
 import com.impaircheck.R
+import com.impaircheck.Utils.getFixedBitmap
 import com.impaircheck.databinding.FragmentFaceCameraBinding
 import com.ml.quaterion.facenetdetection.BitmapUtils
 import com.ml.quaterion.facenetdetection.Constants
@@ -129,7 +130,7 @@ class FaceCameraFragment: Fragment(), FaceAnalyserRepo {
             startCameraPreview()
         }
         val images = ArrayList<Pair<String, Bitmap>>()
-        images.add(Pair("User", getFixedBitmap(Constants.imageUri!!)))
+        images.add(Pair("User", getFixedBitmap(requireContext(),Constants.imageUri!!)))
         fileReader.run(images, fileReaderCallback)
 
     }
@@ -308,7 +309,7 @@ class FaceCameraFragment: Fragment(), FaceAnalyserRepo {
                         val name = doc.name!!
                         for (imageDocFile in doc.listFiles()) {
                             try {
-                                images.add(Pair(name, getFixedBitmap(imageDocFile.uri)))
+                                images.add(Pair(name, getFixedBitmap(requireContext(),imageDocFile.uri)))
                             } catch (e: Exception) {
                                 errorFound = true
                                 break
@@ -347,23 +348,7 @@ class FaceCameraFragment: Fragment(), FaceAnalyserRepo {
             }
         }
 
-    private fun getFixedBitmap(imageFileUri: Uri): Bitmap {
-        var imageBitmap =
-            BitmapUtils.getBitmapFromUri(requireContext().contentResolver, imageFileUri)
-        val exifInterface =
-            ExifInterface(requireContext().contentResolver.openInputStream(imageFileUri)!!)
-        imageBitmap =
-            when (exifInterface.getAttributeInt(
-                ExifInterface.TAG_ORIENTATION,
-                ExifInterface.ORIENTATION_UNDEFINED
-            )) {
-                ExifInterface.ORIENTATION_ROTATE_90 -> BitmapUtils.rotateBitmap(imageBitmap, 90f)
-                ExifInterface.ORIENTATION_ROTATE_180 -> BitmapUtils.rotateBitmap(imageBitmap, 180f)
-                ExifInterface.ORIENTATION_ROTATE_270 -> BitmapUtils.rotateBitmap(imageBitmap, 270f)
-                else -> imageBitmap
-            }
-        return imageBitmap
-    }
+
 
     private val fileReaderCallback = object : FileReader.ProcessCallback {
         override fun onProcessCompleted(
@@ -399,8 +384,6 @@ class FaceCameraFragment: Fragment(), FaceAnalyserRepo {
 
     }
 
-
-    // make a function that Show a warning dialog if the detected user is not the user and please stop cheating
     private fun showWarningDialog() {
         val alertDialog = AlertDialog.Builder(requireContext()).apply {
             setTitle("Warning")

@@ -11,17 +11,17 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
+        android:text="@string/start_screen_title"
         android:textColor="@color/black"
-        android:textStyle="bold"
         android:textSize="24sp"
-        android:text="@string/start_screen_title" />
+        android:textStyle="bold" />
 
 
     <TextView
         android:id="@+id/labelName"
-        android:layout_below="@+id/title_start_screen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/title_start_screen"
         android:text="Name" />
 
     <EditText
@@ -45,26 +45,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/labelID"
-        android:orientation="horizontal"
-        >
+        android:orientation="horizontal">
+
         <EditText
             android:id="@+id/editTextID"
             android:layout_width="0dp"
-            android:layout_weight="4"
             android:layout_height="70dp"
+            android:layout_weight="4"
             android:hint="Enter your ID"
             android:inputType="number" />
 
         <Button
             android:id="@+id/buttonGenerateID"
             android:layout_width="0dp"
+            android:layout_height="70dp"
             android:layout_weight="1"
             android:padding="5dp"
-            android:layout_height="70dp"
             android:text="New User" />
 
     </LinearLayout>
-
 
 
     <Button
@@ -84,5 +83,48 @@
         android:layout_marginTop="16dp"
         android:enabled="false"
         android:text="Submit" />
+
+
+    <View
+        android:id="@+id/loading_overlay_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <RelativeLayout
+        android:id="@+id/loading_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@android:color/white"
+        android:elevation="5dp"
+        android:padding="20dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+
+        <ProgressBar
+            android:id="@+id/progress_circular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/warning_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/progress_circular"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="Loading ..." />
+
+
+
+    </RelativeLayout>
 
 </RelativeLayout>

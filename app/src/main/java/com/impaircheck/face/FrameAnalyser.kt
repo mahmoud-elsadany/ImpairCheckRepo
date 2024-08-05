@@ -81,7 +81,7 @@ class FrameAnalyser( context: Context ,
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(image: ImageProxy) {
         // If the previous frame is still being processed, then skip this frame
-        if ( isProcessing || faceList.size == 0 ) {
+        if ( isProcessing ) {
             image.close()
             return
         }

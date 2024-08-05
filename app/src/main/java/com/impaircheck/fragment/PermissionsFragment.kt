@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.impaircheck.R
+import com.impaircheck.constants.IS_NEW_USER
 
 private val PERMISSIONS_REQUIRED = if (android.os.Build.VERSION.SDK_INT > 32) {
     arrayOf(
@@ -51,6 +52,7 @@ class PermissionsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        IS_NEW_USER = false
         if (hasPermissions(requireContext())) {
             navigateToStart()
         } else {

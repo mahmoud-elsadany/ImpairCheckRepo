@@ -3,10 +3,14 @@ package com.impaircheck
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.media.ExifInterface
+import android.net.Uri
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.pm.PackageInfoCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.ml.quaterion.facenetdetection.BitmapUtils
 
 object Utils {
 
@@ -59,5 +63,25 @@ object Utils {
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputManager.hideSoftInputFromWindow(windowToken, 0)
     }
+
+    fun getFixedBitmap(context: Context,imageFileUri: Uri): Bitmap {
+        var imageBitmap =
+            BitmapUtils.getBitmapFromUri(context.contentResolver, imageFileUri)
+        val exifInterface =
+            ExifInterface(context.contentResolver.openInputStream(imageFileUri)!!)
+        imageBitmap =
+            when (exifInterface.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED
+            )) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> BitmapUtils.rotateBitmap(imageBitmap, 90f)
+                ExifInterface.ORIENTATION_ROTATE_180 -> BitmapUtils.rotateBitmap(imageBitmap, 180f)
+                ExifInterface.ORIENTATION_ROTATE_270 -> BitmapUtils.rotateBitmap(imageBitmap, 270f)
+                else -> imageBitmap
+            }
+        return imageBitmap
+    }
+
+
 
 }
