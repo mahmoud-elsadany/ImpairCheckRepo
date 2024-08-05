@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -16,6 +17,7 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.gson.Gson
@@ -30,6 +32,8 @@ import com.impaircheck.models.userData
 import com.impaircheck.models.userDataItem
 import com.impaircheck.models.userDataUtils.convertToJsonArray
 import com.ml.quaterion.facenetdetection.Constants
+import java.io.File
+import java.io.IOException
 
 class StartScreenFragment : Fragment() {
 
@@ -174,13 +178,14 @@ class StartScreenFragment : Fragment() {
 
             filteredUsers = userList.filter { user -> user != null }
 
+
         }.addOnFailureListener {
             Log.e("firebase", "Error getting data", it)
         }
     }
 
     private fun checkIfUserExists(id: Int): Boolean {
-        return filteredUsers.any { user -> user.Id == id }
+        return filteredUsers.any { user -> user.id == id }
     }
 
 
@@ -188,7 +193,7 @@ class StartScreenFragment : Fragment() {
     private fun handleCheckUserExists() {
         val userId = binding.editTextID.text.toString().toIntOrNull()
 
-        val currentUser: userDataItem? = filteredUsers.find { user -> user.Id == userId }
+        val currentUser: userDataItem? = filteredUsers.find { user -> user.id == userId }
         if (currentUser != null) {
             // Handle the found user
             currentUser.imageLink.let { downloadImageFromFirebase(it) }
@@ -221,17 +226,50 @@ class StartScreenFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun downloadImageFromFirebase(imageLink: String) {
-        val storageReference =
-            FirebaseStorage.getInstance().reference.child(imageLink)
 
-        storageReference.downloadUrl.addOnSuccessListener { uri ->
-            // Load the image using Picasso
-            Log.d("firebase", "Image downloaded successfully. URL: $uri")
-            Constants.imageUri = uri
-//            navigateToCamera(binding.root)
 
-        }.addOnFailureListener { exception ->
-            Log.e("firebase", "Failed to download image", exception)
+
+        Thread {
+            try {
+                val future = Glide.with(this)
+                    .asFile()
+                    .load(imageLink)
+                    .submit()
+
+                val imageFile = future.get()
+                val savedFile = saveFileToExternalStorage(requireContext(), imageFile)
+
+                requireActivity().runOnUiThread {
+                    if (savedFile != null) {
+                        val fileUri: Uri = Uri.fromFile(savedFile)
+                        Log.d("MainActivity", "Image saved. URI: $fileUri")
+                        // Do something with the URI, e.g., pass it to another activity or fragment
+
+                        Constants.imageUri = fileUri
+
+                    } else {
+                        Log.e("MainActivity", "Failed to save image")
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }.start()
+
+
+
+    }
+
+    private fun saveFileToExternalStorage(context: Context, file: File): File? {
+        val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val savedFile = File(storageDir, file.name)
+
+        return try {
+            file.copyTo(savedFile, overwrite = true)
+            savedFile
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
         }
     }
 }

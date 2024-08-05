@@ -1,6 +1,5 @@
-
-
 package com.impaircheck.fragment
+
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -13,25 +12,38 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.impaircheck.R
 
-private val PERMISSIONS_REQUIRED = arrayOf(Manifest.permission.CAMERA)
+private val PERMISSIONS_REQUIRED = if (android.os.Build.VERSION.SDK_INT > 32) {
+    arrayOf(
+        Manifest.permission.CAMERA,
+        Manifest.permission.ACCESS_MEDIA_LOCATION
+    )
+} else {
+    arrayOf(
+        Manifest.permission.CAMERA,
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    )
+}
 
 class PermissionsFragment : Fragment() {
 
+
     private val requestPermissionLauncher =
         registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            val granted = permissions.entries.all { it.value }
+            if (granted) {
                 Toast.makeText(
                     context,
-                    "Permission request granted",
+                    "All permissions granted",
                     Toast.LENGTH_LONG
                 ).show()
-                navigateToCamera()
+                navigateToStart()
             } else {
                 Toast.makeText(
                     context,
-                    "Permission request denied",
+                    "One or more permissions were denied",
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -39,22 +51,14 @@ class PermissionsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        when (PackageManager.PERMISSION_GRANTED) {
-            ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.CAMERA
-            ) -> {
-                navigateToCamera()
-            }
-            else -> {
-                requestPermissionLauncher.launch(
-                    Manifest.permission.CAMERA
-                )
-            }
+        if (hasPermissions(requireContext())) {
+            navigateToStart()
+        } else {
+            requestPermissionLauncher.launch(PERMISSIONS_REQUIRED)
         }
     }
 
-    private fun navigateToCamera() {
+    private fun navigateToStart() {
         lifecycleScope.launchWhenStarted {
             Navigation.findNavController(
                 requireActivity(),
@@ -65,9 +69,10 @@ class PermissionsFragment : Fragment() {
         }
     }
 
+
+    /** Convenience method used to check if all permissions required by this app are granted */
     companion object {
 
-        /** Convenience method used to check if all permissions required by this app are granted */
         fun hasPermissions(context: Context) = PERMISSIONS_REQUIRED.all {
             ContextCompat.checkSelfPermission(
                 context,
@@ -75,4 +80,6 @@ class PermissionsFragment : Fragment() {
             ) == PackageManager.PERMISSION_GRANTED
         }
     }
+
+
 }

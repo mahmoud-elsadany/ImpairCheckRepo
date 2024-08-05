@@ -7,7 +7,7 @@ import com.google.gson.JsonObject
 class userData : ArrayList<userDataItem>()
 
 data class userDataItem(
-    val Id: Int,
+    val id: Int,
     val imageLink: String,
     val name: String
 )
