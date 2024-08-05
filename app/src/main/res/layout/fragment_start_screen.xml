@@ -40,19 +40,38 @@
         android:layout_marginTop="16dp"
         android:text="ID" />
 
-    <EditText
-        android:id="@+id/editTextID"
+    <LinearLayout
+        android:id="@+id/linearLayoutUserID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/labelID"
-        android:layout_marginTop="8dp"
-        android:inputType="number" />
+        android:orientation="horizontal"
+        >
+        <EditText
+            android:id="@+id/editTextID"
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="70dp"
+            android:hint="Enter your ID"
+            android:inputType="number" />
+
+        <Button
+            android:id="@+id/buttonGenerateID"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:padding="5dp"
+            android:layout_height="70dp"
+            android:text="New User" />
+
+    </LinearLayout>
+
+
 
     <Button
         android:id="@+id/buttonCaptureImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/editTextID"
+        android:layout_below="@id/linearLayoutUserID"
         android:layout_marginTop="16dp"
         android:enabled="false"
         android:text="Capture Image" />
