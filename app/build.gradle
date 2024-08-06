@@ -24,6 +24,14 @@ android {
     namespace 'com.impaircheck'
     compileSdk 34
 
+    signingConfigs {
+        release_build {
+            storeFile file('sign_key')
+            keyAlias 'imapirCheck'
+            storePassword '123456'
+            keyPassword '123456'
+        }
+    }
 
     defaultConfig {
         applicationId "com.impaircheck"
@@ -37,6 +45,8 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    flavorDimensions "default"
 
     productFlavors {
         development {
@@ -67,8 +77,14 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             debuggable false
+            signingConfig signingConfigs.release_build
+        }
+        debug {
+            minifyEnabled false
+            debuggable true
+            signingConfig signingConfigs.release_build
         }
     }
     compileOptions {
