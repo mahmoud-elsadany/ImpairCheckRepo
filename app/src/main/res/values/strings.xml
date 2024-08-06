@@ -37,7 +37,7 @@
     <string name="start_screen_title">Fill the required data</string>
     <string name="user_profile_screen_title">Profile Details</string>
     <string name="last_test_date">Last Test Date :</string>
-    <string name="last_test_score">"Last test score: "</string>
+    <string name="last_test_state">"Last Test state: "</string>
     <string name="retest">Re-Test</string>
     <string name="dialog_message">Please make sure to be on camera all the test journey and open your eyes and get close to camera. If you disappeared along the test you will fail immediately and need to retest again</string>
     <string name="dialog_title">Important</string>

@@ -35,7 +35,7 @@
         android:textStyle="bold"
         android:layout_marginTop="16dp"
         android:textSize="18sp"
-        android:text="@string/last_test_score" />
+        android:text="@string/last_test_state" />
 
 
     <Button

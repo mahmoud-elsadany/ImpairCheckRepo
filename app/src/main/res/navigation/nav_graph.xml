@@ -20,13 +20,13 @@
     <fragment
         android:id="@+id/camera_fragment"
         android:name="com.impaircheck.fragment.CameraFragment"
-        android:label="CameraFragment"/>
+        android:label="CameraFragment" />
 
 
     <fragment
         android:id="@+id/questionnaire_fragment"
         android:name="com.impaircheck.fragment.QuestionnaireFragment"
-        android:label="QuestionnaireFragment"/>
+        android:label="QuestionnaireFragment" />
 
 
     <fragment
@@ -48,8 +48,9 @@
         <action
             android:id="@+id/action_registration_to_camera"
             app:destination="@id/faceCameraFragment" />
-        <action android:id="@+id/action_registration_to_enrollment"
-            app:destination="@id/enrollmentFragment"/>
+        <action
+            android:id="@+id/action_registration_to_enrollment"
+            app:destination="@id/enrollmentFragment" />
     </fragment>
 
     <fragment
@@ -81,5 +82,6 @@
         android:id="@+id/userProfileScreenFragment"
         android:name="com.impaircheck.fragment.UserProfileScreenFragment"
         android:label="UserProfileScreenFragment" />
+
 
 </navigation>

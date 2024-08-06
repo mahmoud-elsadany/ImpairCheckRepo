@@ -10,4 +10,6 @@ object constants {
 
     var IS_NEW_USER = false
 
+    var currentUserId = -1
+
 }

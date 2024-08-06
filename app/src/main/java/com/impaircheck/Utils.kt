@@ -10,7 +10,14 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.pm.PackageInfoCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.impaircheck.models.userTestsItem
 import com.ml.quaterion.facenetdetection.BitmapUtils
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object Utils {
 
@@ -82,6 +89,38 @@ object Utils {
         return imageBitmap
     }
 
+    fun convertToJsonArray(data: Map<String, Map<String, Any>>): String {
+        val gson = Gson()
+        val jsonArray = JsonArray()
+
+        data.forEach { (_, value) ->
+            val jsonObject = JsonObject()
+            value.forEach { (key, fieldValue) ->
+                when (fieldValue) {
+                    is Number -> jsonObject.addProperty(key, fieldValue)
+                    is String -> jsonObject.addProperty(key, fieldValue)
+                    is Boolean -> jsonObject.addProperty(key, fieldValue)
+                    else -> jsonObject.addProperty(key, fieldValue.toString())
+                }
+            }
+            jsonArray.add(jsonObject)
+        }
+
+        return gson.toJson(jsonArray)
+    }
 
 
+    fun getCurrentDate(): String {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
+        val currentDate = Date()
+        return dateFormat.format(currentDate)
+    }
+
+    fun getLatestTest(tests: List<userTestsItem>): userTestsItem? {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+
+        return tests.maxByOrNull {
+            dateFormat.parse(it.date)?.time ?: Long.MIN_VALUE
+        }
+    }
 }

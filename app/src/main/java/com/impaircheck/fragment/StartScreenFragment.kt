@@ -23,15 +23,16 @@ import com.google.firebase.storage.StorageReference
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.impaircheck.R
+import com.impaircheck.Utils.convertToJsonArray
 import com.impaircheck.Utils.hideKeyboard
 import com.impaircheck.constants
 import com.impaircheck.constants.IS_NEW_USER
+import com.impaircheck.constants.currentUserId
 import com.impaircheck.constants.fireBaseDatabase
 import com.impaircheck.databinding.FragmentStartScreenBinding
 import com.impaircheck.fragment.RegistrationFragment.Companion.RESULT_KEY_URI
 import com.impaircheck.models.userData
 import com.impaircheck.models.userDataItem
-import com.impaircheck.models.userDataUtils.convertToJsonArray
 import com.ml.quaterion.facenetdetection.Constants
 import java.io.File
 import java.io.IOException
@@ -89,7 +90,7 @@ class StartScreenFragment : Fragment() {
                         "User with ID ${binding.editTextID.text} does not exist. Please generate a new ID.",
                         Toast.LENGTH_SHORT
                     ).show()
-                }else
+                } else
                     navigateToCamera(it)
             }
 
@@ -121,6 +122,8 @@ class StartScreenFragment : Fragment() {
 //                    "User with ID ${binding.editTextID.text} already exists",
 //                    Toast.LENGTH_SHORT
 //                ).show()
+
+                currentUserId = binding.editTextID.text.toString().toInt()
                 findNavController().navigate(R.id.userProfileScreenFragment)
             } else
                 handleSubmitNewUser()
@@ -161,6 +164,8 @@ class StartScreenFragment : Fragment() {
             ).show()
         } else {
             fireBaseDatabase.child("users").child(id).setValue(newUserData)
+
+            currentUserId = id.toInt()
 
             findNavController().navigate(R.id.userProfileScreenFragment)
         }
@@ -296,11 +301,12 @@ class StartScreenFragment : Fragment() {
     }
 
 
-    private fun showLoading(){
+    private fun showLoading() {
         binding.loadingLayout.visibility = View.VISIBLE
         binding.loadingOverlayView.visibility = View.VISIBLE
     }
-    private fun hideLoading(){
+
+    private fun hideLoading() {
         binding.loadingLayout.visibility = View.GONE
         binding.loadingOverlayView.visibility = View.GONE
     }
