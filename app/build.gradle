@@ -8,6 +8,19 @@ plugins {
 }
 
 android {
+
+    bundle {
+        density {
+            enableSplit = false
+        }
+        language {
+            enableSplit = false
+        }
+        abi {
+            enableSplit = false
+        }
+    }
+
     namespace 'com.impaircheck'
     compileSdk 34
 
@@ -25,9 +38,37 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    productFlavors {
+        development {
+            dimension "default"
+            versionNameSuffix ".dev"
+
+            buildConfigField "String", "ENV", "\"development\""
+
+        }
+        qc_testing {
+            dimension "default"
+            versionNameSuffix ".testing"
+
+
+            buildConfigField "String", "ENV", "\"testing\""
+
+        }
+        production {
+            dimension "default"
+            versionNameSuffix ".prod"
+
+
+            buildConfigField "String", "ENV", "\"production\""
+
+        }
+    }
+
+
     buildTypes {
         release {
             minifyEnabled false
+            debuggable false
         }
     }
     compileOptions {
