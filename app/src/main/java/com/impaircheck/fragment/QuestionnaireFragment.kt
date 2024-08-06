@@ -50,6 +50,8 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.impaircheck.BuildConfig
 import com.impaircheck.R
 import com.impaircheck.compose.ChatScreen
+import com.impaircheck.constants.currentTestObject
+import com.impaircheck.constants.fireBaseDatabase
 import com.impaircheck.databinding.FragmentFaceCameraBinding
 import com.impaircheck.databinding.FragmentQuestionnaireBinding
 import com.ml.quaterion.facenetdetection.BitmapUtils
@@ -195,7 +197,7 @@ class QuestionnaireFragment : Fragment(), FaceAnalyserRepo {
                 messages.add("Bot: $it")
                 chatHistory.add(content("model") { text(it) })
 
-                if (it.contains("Thank you for")) {
+                if (it.contains("Thank you for") || it.contains("Take care")) {
                     showCompletedDialog()
                 }
 
@@ -500,8 +502,7 @@ class QuestionnaireFragment : Fragment(), FaceAnalyserRepo {
             setPositiveButton("OK") { dialog, which ->
                 dialog.dismiss()
 
-                //pop the back stack to the user profile fragment
-                findNavController().popBackStack(R.id.userProfileScreenFragment, true)
+                updateCurrentTest()
             }
             create()
         }
@@ -522,6 +523,41 @@ class QuestionnaireFragment : Fragment(), FaceAnalyserRepo {
         }
 
 
+    }
+
+
+    private fun updateCurrentTest() {
+        if (currentTestObject != null) {
+            val testId = currentTestObject!!.id
+            val userUpdatedTestObj = currentTestObject
+
+            userUpdatedTestObj!!.questionnaire_chat = convertMessagesToString(messages)
+            userUpdatedTestObj.state = "Pending Results"
+
+
+            fireBaseDatabase.child("tests").child(testId.toString()).setValue(userUpdatedTestObj)
+
+            currentTestObject = userUpdatedTestObj
+
+            //pop the back stack to the user profile fragment
+            findNavController().popBackStack(R.id.userProfileScreenFragment, false)
+        } else {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.error_in_getting_test),
+                Toast.LENGTH_SHORT
+            ).show()
+
+            findNavController().popBackStack(R.id.userProfileScreenFragment, false)
+
+
+        }
+
+
+    }
+
+    private fun convertMessagesToString(messages: MutableList<String>, separator: String = ", "): String {
+        return messages.joinToString(separator)
     }
 
 
