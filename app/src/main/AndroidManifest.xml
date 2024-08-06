@@ -21,6 +21,9 @@
         android:name="android.permission.ACCESS_MEDIA_LOCATION" />
 
 
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+
+
     <application
         android:name=".application.ApplicationMain"
         android:allowBackup="true"
