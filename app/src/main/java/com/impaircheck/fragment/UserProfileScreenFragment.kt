@@ -18,6 +18,7 @@ import com.impaircheck.Utils.convertToJsonArray
 import com.impaircheck.Utils.getCurrentDate
 import com.impaircheck.Utils.getLatestTest
 import com.impaircheck.constants.IS_NEW_USER
+import com.impaircheck.constants.currentTestObject
 import com.impaircheck.constants.currentUserId
 import com.impaircheck.constants.fireBaseDatabase
 import com.impaircheck.databinding.FragmentUserProfileBinding
@@ -79,7 +80,9 @@ class UserProfileScreenFragment : Fragment() {
             Log.d("firebase", "Got value ${it.value}")
 
 
-
+            if (it.value.toString().contains("null")) {
+                return@addOnSuccessListener
+            }
             val jsonString = convertToJsonArray(it.value as Map<String, Map<String, Any>>)
 
             val gson = Gson()
@@ -111,15 +114,18 @@ class UserProfileScreenFragment : Fragment() {
             id = testId,
             date = getCurrentDate(),
             first_pose = false,
-            left_eye_percentage = -1,
-            questionnaire_chat = "", right_eye_percentage = 1,
+            left_eye_percentage = -1.0,
+            questionnaire_chat = "", right_eye_percentage = -1.0,
             second_pose = false,
             userId = currentUserId,
             state = "not completed"
         )
 
+
+
         fireBaseDatabase.child("tests").child(testId.toString()).setValue(userNewTestObj)
 
+        currentTestObject = userNewTestObj
 
         findNavController().navigate(R.id.faceCameraFragment)
 

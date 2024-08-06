@@ -50,6 +50,7 @@
     <string name="update_dialog_title">New update available</string>
     <string name="update">update</string>
     <string name="make_sure_to_update">make sure to update to latest app version</string>
+    <string name="error_in_getting_test">Error in test .. please try again</string>
 
     <string-array name="delegate_spinner_titles">
         <item>CPU</item>

@@ -1,6 +1,7 @@
 package com.impaircheck
 
 import com.google.firebase.database.DatabaseReference
+import com.impaircheck.models.userTestsItem
 
 object constants {
 
@@ -11,5 +12,7 @@ object constants {
     var IS_NEW_USER = false
 
     var currentUserId = -1
+
+    var currentTestObject: userTestsItem? = null
 
 }

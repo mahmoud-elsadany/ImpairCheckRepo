@@ -43,7 +43,12 @@ import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarkerResult
 import com.impaircheck.FaceLandmarkerHelper
 import com.impaircheck.MainViewModel
 import com.impaircheck.R
+import com.impaircheck.Utils.getCurrentDate
+import com.impaircheck.constants.currentTestObject
+import com.impaircheck.constants.currentUserId
+import com.impaircheck.constants.fireBaseDatabase
 import com.impaircheck.databinding.FragmentGalleryBinding
+import com.impaircheck.models.userTestsItem
 import com.ml.quaterion.facenetdetection.Constants
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.Executors
@@ -58,6 +63,9 @@ class BloodShotEyePrecentageFragment : Fragment(), FaceLandmarkerHelper.Landmark
         VIDEO,
         UNKNOWN
     }
+
+    private var LeftEyeRedPercentage: Double = 0.0
+    private var RightEyeRedPercentage: Double = 0.0
 
     //sadany get color of eye
     private lateinit var CapturedBitmap: Bitmap
@@ -273,7 +281,7 @@ class BloodShotEyePrecentageFragment : Fragment(), FaceLandmarkerHelper.Landmark
         dialog.setMessage(getString(R.string.dialog_go_to_move_analysis_message))
         dialog.setPositiveButton("OK") { dialogInterface: DialogInterface, i: Int ->
             dialogInterface.dismiss()
-            findNavController().navigate(R.id.moveAnalysisFragment)
+            updateCurrentTest()
         }
         dialog.show()
     }
@@ -378,6 +386,10 @@ class BloodShotEyePrecentageFragment : Fragment(), FaceLandmarkerHelper.Landmark
         fragmentGalleryBinding.captureEyeButton.setOnClickListener {
             if (faceLandmarkerResults != null && imageWidth != -1 && imageHeight != -1 && scaleFactor != -1F) {
 
+                showLoading()
+                RightEyeRedPercentage = 0.0
+                LeftEyeRedPercentage = 0.0
+
                 showRedPercentageInRightEye(
                     CapturedBitmap,
                     imageWidth,
@@ -393,10 +405,14 @@ class BloodShotEyePrecentageFragment : Fragment(), FaceLandmarkerHelper.Landmark
 
                 fragmentGalleryBinding.nextButton.isEnabled = true
 
-            } else{
-                findNavController().popBackStack(R.id.userProfileScreenFragment,true)
+            } else {
+                findNavController().popBackStack(R.id.userProfileScreenFragment, true)
 
-                Toast.makeText(requireContext(), "Face not detected pls re-try again", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Face not detected pls re-try again",
+                    Toast.LENGTH_SHORT
+                ).show()
 
             }
 
@@ -739,14 +755,18 @@ class BloodShotEyePrecentageFragment : Fragment(), FaceLandmarkerHelper.Landmark
 //        println("ColorPercentage$name in Hex: $hexColor")
 
 
-        if (name == "RightEye")
+        if (name == "LeftEye") {
+            LeftEyeRedPercentage = calculateRedPercentage(redSum, greenSum, blueSum)
             fragmentGalleryBinding.tvLeftRedPercentage.text =
-                "LeftEye Red Percentage: ${calculateRedPercentage(redSum, greenSum, blueSum)}"
-        else
+                "LeftEye Red Percentage: $LeftEyeRedPercentage"
+        } else {
+            RightEyeRedPercentage = calculateRedPercentage(redSum, greenSum, blueSum)
             fragmentGalleryBinding.tvRightRedPercentage.text =
-                "RightEye Red Percentage: ${calculateRedPercentage(redSum, greenSum, blueSum)}"
+                "RightEye Red Percentage: $RightEyeRedPercentage"
+        }
 
-
+        if (RightEyeRedPercentage != 0.0 && LeftEyeRedPercentage != 0.0)
+            hideLoading()
 
     }
 
@@ -782,14 +802,14 @@ class BloodShotEyePrecentageFragment : Fragment(), FaceLandmarkerHelper.Landmark
         backgroundExecutor.execute {
 
             faceLandmarkerHelper = FaceLandmarkerHelper(
-                    context = requireContext(),
-                    runningMode = RunningMode.VIDEO,
-                    minFaceDetectionConfidence = viewModel.currentMinFaceDetectionConfidence,
-                    minFaceTrackingConfidence = viewModel.currentMinFaceTrackingConfidence,
-                    minFacePresenceConfidence = viewModel.currentMinFacePresenceConfidence,
-                    maxNumFaces = viewModel.currentMaxFaces,
-                    currentDelegate = viewModel.currentFaceDelegate
-                )
+                context = requireContext(),
+                runningMode = RunningMode.VIDEO,
+                minFaceDetectionConfidence = viewModel.currentMinFaceDetectionConfidence,
+                minFaceTrackingConfidence = viewModel.currentMinFaceTrackingConfidence,
+                minFacePresenceConfidence = viewModel.currentMinFacePresenceConfidence,
+                maxNumFaces = viewModel.currentMaxFaces,
+                currentDelegate = viewModel.currentFaceDelegate
+            )
 
             activity?.runOnUiThread {
                 fragmentGalleryBinding.videoView.visibility = View.GONE
@@ -940,4 +960,44 @@ class BloodShotEyePrecentageFragment : Fragment(), FaceLandmarkerHelper.Landmark
         // Value used to get frames at specific intervals for inference (e.g. every 300ms)
         private const val VIDEO_INTERVAL_MS = 300L
     }
+
+
+    private fun updateCurrentTest() {
+        if (currentTestObject != null) {
+            val testId = currentTestObject!!.id
+            val userUpdatedTestObj = currentTestObject
+
+            userUpdatedTestObj!!.right_eye_percentage = RightEyeRedPercentage
+            userUpdatedTestObj.left_eye_percentage = LeftEyeRedPercentage
+
+            fireBaseDatabase.child("tests").child(testId.toString()).setValue(userUpdatedTestObj)
+
+            currentTestObject = userUpdatedTestObj
+            findNavController().navigate(R.id.moveAnalysisFragment)
+
+        } else {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.error_in_getting_test),
+                Toast.LENGTH_SHORT
+            ).show()
+
+            findNavController().popBackStack(R.id.userProfileScreenFragment, true)
+
+
+        }
+
+
+    }
+
+    private fun showLoading() {
+        fragmentGalleryBinding.loadingLayout.visibility = View.VISIBLE
+        fragmentGalleryBinding.loadingOverlayView.visibility = View.VISIBLE
+    }
+
+    private fun hideLoading() {
+        fragmentGalleryBinding.loadingLayout.visibility = View.GONE
+        fragmentGalleryBinding.loadingOverlayView.visibility = View.GONE
+    }
+
 }
