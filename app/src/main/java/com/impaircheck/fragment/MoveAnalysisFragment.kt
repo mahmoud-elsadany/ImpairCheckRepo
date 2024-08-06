@@ -27,6 +27,8 @@ import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.impaircheck.MainViewModel
 import com.impaircheck.PoseLandmarkerHelper
 import com.impaircheck.R
+import com.impaircheck.constants.currentTestObject
+import com.impaircheck.constants.fireBaseDatabase
 import com.impaircheck.databinding.FragmentMoveAnalysisBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -58,7 +60,7 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
-    private var cameraFacing = CameraSelector.LENS_FACING_BACK
+    private var cameraFacing = CameraSelector.LENS_FACING_FRONT
 
     /** Blocking ML operations are performed using this executor */
     private lateinit var backgroundExecutor: ExecutorService
@@ -177,7 +179,7 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
 
         fragmentCameraBinding.nextButton.setOnClickListener {
             //navigate to next fragment
-            findNavController().navigate(R.id.questionnaire_fragment)
+            updateCurrentTest()
         }
 
     }
@@ -693,4 +695,37 @@ class MoveAnalysisFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener
             }
         }
     }
+
+
+    private fun updateCurrentTest(){
+        if (currentTestObject != null) {
+            val testId = currentTestObject!!.id
+            val userUpdatedTestObj = currentTestObject
+
+            userUpdatedTestObj!!.first_pose = true
+            userUpdatedTestObj.second_pose = true
+
+
+            fireBaseDatabase.child("tests").child(testId.toString()).setValue(userUpdatedTestObj)
+
+            currentTestObject = userUpdatedTestObj
+
+            findNavController().navigate(R.id.questionnaire_fragment)
+
+
+        } else {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.error_in_getting_test),
+                Toast.LENGTH_SHORT
+            ).show()
+
+            findNavController().popBackStack(R.id.userProfileScreenFragment, true)
+
+
+        }
+
+
+    }
+
 }
