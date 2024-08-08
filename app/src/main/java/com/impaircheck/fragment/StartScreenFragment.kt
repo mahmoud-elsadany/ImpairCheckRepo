@@ -300,7 +300,6 @@ class StartScreenFragment : Fragment() {
         }
     }
 
-
     private fun showLoading() {
         binding.loadingLayout.visibility = View.VISIBLE
         binding.loadingOverlayView.visibility = View.VISIBLE
