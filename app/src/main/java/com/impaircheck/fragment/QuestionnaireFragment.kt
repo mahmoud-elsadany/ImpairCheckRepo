@@ -117,7 +117,6 @@ class QuestionnaireFragment : Fragment(), FaceAnalyserRepo {
         model = GenerativeModel(
             "gemini-1.5-flash",
             BuildConfig.googelAPIKeyForAI,
-
             generationConfig = generationConfig {
                 temperature = 0.05f
                 topK = 64
